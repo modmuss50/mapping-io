@@ -96,13 +96,13 @@ public class JobfFileReader {
 						// field: f <cls-a>.<name-a>:<desc-a> = <name-b>
 						// method: m <cls-a>.<name-a><desc-a> = <name-b>
 						String src = reader.nextCol();
-						if (src == null || src.isEmpty()) throw new IOException("missing class/name/desc a in line "+reader.getLineNumber());
+						if (src == null || src.isEmpty()) throw new IOException("missing class-/name-/desc-a in line "+reader.getLineNumber());
 
 						int nameSepPos = src.lastIndexOf('.');
-						if (nameSepPos <= 0 || nameSepPos == src.length() - 1) throw new IOException("invalid class/name/desc a in line "+reader.getLineNumber());
+						if (nameSepPos <= 0 || nameSepPos == src.length() - 1) throw new IOException("invalid class-/name-/desc-a in line "+reader.getLineNumber());
 
 						int descSepPos = src.lastIndexOf(isField ? ':' : '(');
-						if (descSepPos <= 0 || descSepPos == src.length() - 1) throw new IOException("invalid name/desc a in line "+reader.getLineNumber());
+						if (descSepPos <= 0 || descSepPos == src.length() - 1) throw new IOException("invalid name-/desc-a in line "+reader.getLineNumber());
 
 						readSeparator(reader);
 
