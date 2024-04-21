@@ -78,6 +78,12 @@ public final class RecafSimpleFileReader {
 					if (line == null || line.trim().isEmpty() || line.trim().startsWith("#")) continue;
 
 					String[] parts = line.split(" ");
+
+					if (parts.length < 2) {
+						insufficientColumnCount(reader);
+						continue;
+					}
+
 					int dotPos = parts[0].lastIndexOf('.');
 					String clsSrcName;
 					String clsDstName = null;
@@ -109,7 +115,7 @@ public final class RecafSimpleFileReader {
 								memberSrcDesc = memberIdentifier.substring(mthDescPos);
 							}
 						} else {
-							throw new IOException("Invalid Recaf Simple line "+reader.getLineNumber()+": Insufficient column count!");
+							insufficientColumnCount(reader);
 						}
 					}
 
@@ -146,5 +152,9 @@ public final class RecafSimpleFileReader {
 		if (parentVisitor != null) {
 			((MappingTree) visitor).accept(parentVisitor);
 		}
+	}
+
+	private static void insufficientColumnCount(ColumnFileReader reader) throws IOException {
+		throw new IOException("Invalid Recaf Simple line "+reader.getLineNumber()+": Insufficient column count!");
 	}
 }
