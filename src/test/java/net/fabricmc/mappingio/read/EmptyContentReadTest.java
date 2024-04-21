@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 import java.io.StringReader;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.format.enigma.EnigmaFileReader;
@@ -36,7 +37,12 @@ import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import net.fabricmc.mappingio.tree.VisitableMappingTree;
 
 public class EmptyContentReadTest {
-	private static final VisitableMappingTree tree = new MemoryMappingTree();
+	private VisitableMappingTree tree;
+
+	@BeforeEach
+	public void instantiateTree() {
+		tree = new MemoryMappingTree();
+	}
 
 	@Test
 	public void emptyEnigmaFile() throws Exception {
@@ -46,11 +52,13 @@ public class EmptyContentReadTest {
 	@Test
 	public void emptyTinyFile() throws Exception {
 		assertThrows(IOException.class, () -> Tiny1FileReader.read(new StringReader(""), tree));
+		Tiny1FileReader.read(new StringReader("v1\t"), tree);
 	}
 
 	@Test
 	public void emptyTinyV2File() throws Exception {
 		assertThrows(IOException.class, () -> Tiny2FileReader.read(new StringReader(""), tree));
+		Tiny2FileReader.read(new StringReader("tiny\t2\t0"), tree);
 	}
 
 	@Test
