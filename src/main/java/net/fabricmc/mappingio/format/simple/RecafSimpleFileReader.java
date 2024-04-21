@@ -32,6 +32,9 @@ import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 /**
  * {@linkplain MappingFormat#RECAF_SIMPLE_FILE Recaf Simple file} reader.
+ *
+ * <p>Crashes if a second visit pass is requested without
+ * {@link MappingFlag#NEEDS_MULTIPLE_PASSES} having been passed beforehand.
  */
 public final class RecafSimpleFileReader {
 	private RecafSimpleFileReader() {

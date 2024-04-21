@@ -32,6 +32,9 @@ import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 /**
  * {@linkplain MappingFormat#JOBF_FILE JOBF file} reader.
+ *
+ * <p>Crashes if a second visit pass is requested without
+ * {@link MappingFlag#NEEDS_MULTIPLE_PASSES} having been passed beforehand.
  */
 public class JobfFileReader {
 	private JobfFileReader() {
