@@ -103,7 +103,7 @@ public class ValidContentReadTest {
 	}
 
 	@Test
-	public void tsrg2File() throws Exception {
+	public void tsrgV2File() throws Exception {
 		MappingFormat format = MappingFormat.TSRG_2_FILE;
 		checkDefault(format);
 		checkHoles(format);
