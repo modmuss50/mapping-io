@@ -147,6 +147,7 @@ public final class JamFileReader {
 								visitor.visitDstName(MappedElementKind.METHOD, 0, dstName);
 								visitor.visitElementContent(MappedElementKind.METHOD);
 							} else {
+								visitor.visitElementContent(MappedElementKind.METHOD);
 								visitor.visitMethodArg(argSrcPos, -1, null);
 								visitor.visitDstName(MappedElementKind.METHOD_ARG, 0, dstName);
 								visitor.visitElementContent(MappedElementKind.METHOD_ARG);
