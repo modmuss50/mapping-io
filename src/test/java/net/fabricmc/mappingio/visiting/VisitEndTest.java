@@ -108,6 +108,12 @@ public class VisitEndTest {
 	}
 
 	@Test
+	public void recafSimpleFile() throws Exception {
+		MappingFormat format = MappingFormat.RECAF_SIMPLE_FILE;
+		check(format);
+	}
+
+	@Test
 	public void jobfFile() throws Exception {
 		MappingFormat format = MappingFormat.JOBF_FILE;
 		check(format);
