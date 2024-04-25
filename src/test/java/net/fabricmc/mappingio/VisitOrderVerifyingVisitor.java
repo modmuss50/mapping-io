@@ -17,7 +17,10 @@
 package net.fabricmc.mappingio;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +49,7 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 		resetVisitedElementContentUpTo(0);
 		visitedEnd = false;
 		lastVisitedElement = null;
+		lastSrcInfo.clear();
 	}
 
 	private void resetVisitedElementContentUpTo(int inclusiveLevel) {
@@ -97,8 +101,10 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 	@Override
 	public boolean visitClass(String srcName) throws IOException {
 		MappedElementKind elementKind = MappedElementKind.CLASS;
+		SrcInfo srcInfo = new SrcInfo().srcName(srcName);
 
 		assertContentVisited();
+		assertNewSrcInfo(elementKind, srcInfo);
 
 		visitedClass = true;
 		visitedField = false;
@@ -106,6 +112,7 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 		visitedMethodArg = false;
 		visitedMethodVar = false;
 		lastVisitedElement = elementKind;
+		lastSrcInfo.put(elementKind, srcInfo);
 		resetVisitedElementContentUpTo(elementKind.level);
 
 		return super.visitClass(srcName);
@@ -114,15 +121,20 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 	@Override
 	public boolean visitField(String srcName, @Nullable String srcDesc) throws IOException {
 		MappedElementKind elementKind = MappedElementKind.FIELD;
+		SrcInfo srcInfo = new SrcInfo()
+				.srcName(srcName)
+				.srcDesc(srcDesc);
 
 		assertClassVisited();
 		assertElementContentVisited(elementKind.level - 1);
+		assertNewSrcInfo(elementKind, srcInfo);
 
 		visitedField = true;
 		visitedMethod = false;
 		visitedMethodArg = false;
 		visitedMethodVar = false;
 		lastVisitedElement = elementKind;
+		lastSrcInfo.put(elementKind, srcInfo);
 		resetVisitedElementContentUpTo(elementKind.level);
 
 		return super.visitField(srcName, srcDesc);
@@ -131,20 +143,20 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 	@Override
 	public boolean visitMethod(String srcName, @Nullable String srcDesc) throws IOException {
 		MappedElementKind elementKind = MappedElementKind.METHOD;
+		SrcInfo srcInfo = new SrcInfo()
+				.srcName(srcName)
+				.srcDesc(srcDesc);
 
 		assertClassVisited();
 		assertElementContentVisited(elementKind.level - 1);
-
-		if (!visitedMethod) {
-			assertMethodArgNotVisited();
-			assertMethodVarNotVisited();
-		}
+		assertNewSrcInfo(elementKind, srcInfo);
 
 		visitedField = false;
 		visitedMethod = true;
 		visitedMethodArg = false;
 		visitedMethodVar = false;
 		lastVisitedElement = elementKind;
+		lastSrcInfo.put(elementKind, srcInfo);
 		resetVisitedElementContentUpTo(elementKind.level);
 
 		return super.visitMethod(srcName, srcDesc);
@@ -153,14 +165,20 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 	@Override
 	public boolean visitMethodArg(int argPosition, int lvIndex, @Nullable String srcName) throws IOException {
 		MappedElementKind elementKind = MappedElementKind.METHOD_ARG;
+		SrcInfo srcInfo = new SrcInfo()
+				.argPosition(argPosition)
+				.lvIndex(lvIndex)
+				.srcName(srcName);
 
 		assertFieldNotVisited();
 		assertMethodVisited();
 		assertElementContentVisited(elementKind.level - 1);
+		assertNewSrcInfo(elementKind, srcInfo);
 
 		visitedMethodArg = true;
 		visitedMethodVar = false;
 		lastVisitedElement = elementKind;
+		lastSrcInfo.put(elementKind, srcInfo);
 		resetVisitedElementContentUpTo(elementKind.level);
 
 		return super.visitMethodArg(argPosition, lvIndex, srcName);
@@ -169,14 +187,22 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 	@Override
 	public boolean visitMethodVar(int lvtRowIndex, int lvIndex, int startOpIdx, int endOpIdx, @Nullable String srcName) throws IOException {
 		MappedElementKind elementKind = MappedElementKind.METHOD_VAR;
+		SrcInfo srcInfo = new SrcInfo()
+				.lvtRowIndex(lvtRowIndex)
+				.lvIndex(lvIndex)
+				.startOpIdx(startOpIdx)
+				.endOpIdx(endOpIdx)
+				.srcName(srcName);
 
 		assertFieldNotVisited();
 		assertMethodVisited();
 		assertElementContentVisited(elementKind.level - 1);
+		assertNewSrcInfo(elementKind, srcInfo);
 
 		visitedMethodArg = false;
 		visitedMethodVar = true;
 		lastVisitedElement = elementKind;
+		lastSrcInfo.put(elementKind, srcInfo);
 		resetVisitedElementContentUpTo(elementKind.level);
 
 		return super.visitMethodVar(lvtRowIndex, lvIndex, startOpIdx, endOpIdx, srcName);
@@ -369,6 +395,12 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 		}
 	}
 
+	private void assertNewSrcInfo(MappedElementKind kind, SrcInfo srcInfo) {
+		if (srcInfo.equals(lastSrcInfo.get(kind))) {
+			throw new IllegalStateException("Same source name visited twice in a row");
+		}
+	}
+
 	boolean visitedHeader;
 	boolean visitedNamespaces;
 	boolean visitedMetadata;
@@ -381,4 +413,75 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 	boolean[] visitedElementContent = new boolean[3];
 	boolean visitedEnd;
 	MappedElementKind lastVisitedElement;
+	Map<MappedElementKind, SrcInfo> lastSrcInfo = new HashMap<>();
+
+	private static class SrcInfo {
+		SrcInfo srcName(String srcName) {
+			this.srcName = srcName;
+			return this;
+		}
+
+		SrcInfo srcDesc(String srcDesc) {
+			this.srcDesc = srcDesc;
+			return this;
+		}
+
+		SrcInfo argPosition(int argPosition) {
+			this.argPosition = argPosition;
+			return this;
+		}
+
+		SrcInfo lvIndex(int lvIndex) {
+			this.lvIndex = lvIndex;
+			return this;
+		}
+
+		SrcInfo lvtRowIndex(int lvtRowIndex) {
+			this.lvtRowIndex = lvtRowIndex;
+			return this;
+		}
+
+		SrcInfo startOpIdx(int startOpIdx) {
+			this.startOpIdx = startOpIdx;
+			return this;
+		}
+
+		SrcInfo endOpIdx(int endOpIdx) {
+			this.endOpIdx = endOpIdx;
+			return this;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+
+			if (o == null) {
+				return false;
+			}
+
+			if (o instanceof SrcInfo) {
+				SrcInfo other = (SrcInfo) o;
+
+				return Objects.equals(srcName, other.srcName)
+						&& Objects.equals(srcDesc, other.srcDesc)
+						&& argPosition == other.argPosition
+						&& lvIndex == other.lvIndex
+						&& lvtRowIndex == other.lvtRowIndex
+						&& startOpIdx == other.startOpIdx
+						&& endOpIdx == other.endOpIdx;
+			}
+
+			return false;
+		}
+
+		private String srcName;
+		private String srcDesc;
+		private int argPosition;
+		private int lvIndex;
+		private int lvtRowIndex;
+		private int startOpIdx;
+		private int endOpIdx;
+	}
 }
