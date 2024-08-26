@@ -49,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>The same element may be visited more than once unless the flags contain {@link MappingFlag#NEEDS_ELEMENT_UNIQUENESS}.
  *
  * <p>If an exception is thrown during visitation, the visitor is to be considered in an invalid state.
- * {@link #reset()} must be called clear the internal state before further visitations can happen.
+ * {@link #reset()} must be called to clear the internal state before further visitations can happen.
  */
 public interface MappingVisitor {
 	default Set<MappingFlag> getFlags() {
@@ -100,9 +100,9 @@ public interface MappingVisitor {
 	 * Visit a parameter.
 	 *
 	 * @param argPosition Always starts at 0 and gets incremented by 1 for each additional parameter.
-	 * @param lvIndex The parameter's local variable index in the current method.
+	 * @param lvIndex The parameter's local variable index in the current method, also known as {@code slot}.
 	 * Starts at 0 for static methods, 1 otherwise. For each additional parameter,
-	 * it gets incremented by 1, or by 2 if it's a primitive {@code long} or {@code double}.
+	 * it gets incremented by 1, or by 2 if it's a double-wide primitive ({@code long} or {@code double}).
 	 * @param srcName The optional source name of the parameter.
 	 * @return Whether or not the arg's content should be visited too.
 	 */
@@ -115,9 +115,10 @@ public interface MappingVisitor {
 	 * (local variable table). It is optional, so -1 can be passed instead.
 	 * This is the case since LVTs themselves are optional debug information, see
 	 * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.13">JVMS 4.7.13</a>.
-	 * @param lvIndex The var's local variable index in the current method. For each additional variable,
-	 * it gets incremented by 1, or by 2 if it's a primitive {@code long} or {@code double}.
-	 * The first variable starts where the last parameter left off (plus the offset).
+	 * @param lvIndex The var's local variable index in the current method, also known as {@code slot}.
+	 * For each additional variable, it gets incremented by 1,
+	 * or by 2 if it's a double-wide primitive ({@code long} or {@code double}).
+	 * The first variable starts at the last parameter's slot plus wideness.
 	 * @param startOpIdx Required for cases when the lvIndex alone doesn't uniquely identify a local variable.
 	 * This is the case when variables get re-defined later on, in which case most decompilers opt to
 	 * not re-define the existing var, but instead generate a new one (with both sharing the same lvIndex).
