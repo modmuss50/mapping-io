@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Added IntelliJ IDEA migration map reader and writer
 - Added `MappingFormat#features()` to allow for more fine-grained programmatic querying of format capabilities
+- Added tests to validate our writer outputs against 3rd-party readers
 - Overhauled the internal `ColumnFileReader` to behave more consistently
 - Made handling of the `NEEDS_MULTIPLE_PASSES` flag more consistent, reducing memory usage in a few cases
 - Made some internal methods in Enigma and TSRG readers actually private
