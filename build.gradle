@@ -1,6 +1,6 @@
 plugins {
-	id "com.diffplug.spotless" version "6.22.0" apply false
-	id "me.modmuss50.remotesign" version "0.4.0" apply false
+	id "com.diffplug.spotless" apply false
+	id "me.modmuss50.remotesign" apply false
 }
 
 def ENV = System.getenv()
