@@ -32,8 +32,7 @@ public enum MappingFormat {
 	/**
 	 * The {@code Tiny} mapping format, as specified <a href="https://fabricmc.net/wiki/documentation:tiny">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * File metadata only has limited support as of now, and is hardcoded to intermediary counters.
+	 * @implNote File metadata only has limited support as of now, and is hardcoded to intermediary counters.
 	 */
 	TINY_FILE("Tiny file", "tiny", true, FeatureSetBuilder.create()
 			.withNamespaces(true)
@@ -86,8 +85,7 @@ public enum MappingFormat {
 	/**
 	 * Enigma's mapping format, as specified <a href="https://fabricmc.net/wiki/documentation:enigma_mappings">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Access modifiers are currently not supported.
+	 * @implNote Access modifiers are currently not supported.
 	 */
 	ENIGMA_FILE("Enigma file", "mapping", true, FeatureSetBuilder.create()
 			.withElementMetadata(MetadataSupport.FIXED) // access modifiers
@@ -112,16 +110,14 @@ public enum MappingFormat {
 	/**
 	 * Enigma's mapping format (in directory form), as specified <a href="https://fabricmc.net/wiki/documentation:enigma_mappings">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Access modifiers are currently not supported.
+	 * @implNote Access modifiers are currently not supported.
 	 */
 	ENIGMA_DIR("Enigma directory", null, true, FeatureSetBuilder.createFrom(ENIGMA_FILE.features)),
 
 	/**
 	 * The {@code SRG} ("Searge RetroGuard") mapping format, as specified <a href="https://github.com/MinecraftForge/SrgUtils/blob/67f30647ece29f18256ca89a23cda6216d6bd21e/src/main/java/net/minecraftforge/srgutils/InternalUtils.java#L69-L81">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Package mappings are currently not supported.
+	 * @implNote Package mappings are currently not supported.
 	 */
 	SRG_FILE("SRG file", "srg", true, FeatureSetBuilder.create()
 			.withPackages(p -> p
@@ -146,8 +142,7 @@ public enum MappingFormat {
 	 *
 	 * <p>Same as SRG, but with field descriptors.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Package mappings are currently not supported.
+	 * @implNote Package mappings are currently not supported.
 	 */
 	XSRG_FILE("XSRG file", "xsrg", true, FeatureSetBuilder.createFrom(SRG_FILE.features)
 			.withFields(f -> f
@@ -173,8 +168,7 @@ public enum MappingFormat {
 	/**
 	 * The {@code CSRG} ("Compact SRG", since it saves disk space over SRG) mapping format, as specified <a href="https://github.com/MinecraftForge/SrgUtils/blob/67f30647ece29f18256ca89a23cda6216d6bd21e/src/main/java/net/minecraftforge/srgutils/InternalUtils.java#L196-L207">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Package mappings are currently not supported.
+	 * @implNote Package mappings are currently not supported.
 	 */
 	CSRG_FILE("CSRG file", "csrg", true, FeatureSetBuilder.createFrom(SRG_FILE.features)
 			.withMethods(m -> m
@@ -185,16 +179,14 @@ public enum MappingFormat {
 	 *
 	 * <p>Same as CSRG, but hierarchical instead of flat.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Package mappings are currently not supported.
+	 * @implNote Package mappings are currently not supported.
 	 */
 	TSRG_FILE("TSRG file", "tsrg", true, FeatureSetBuilder.createFrom(CSRG_FILE.features)),
 
 	/**
 	 * The {@code TSRG v2} mapping format, as specified <a href="https://github.com/MinecraftForge/SrgUtils/blob/67f30647ece29f18256ca89a23cda6216d6bd21e/src/main/java/net/minecraftforge/srgutils/InternalUtils.java#L262-L285">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Package mappings and static markers for methods are currently not supported.
+	 * @implNote Package mappings and static markers for methods are currently not supported.
 	 */
 	TSRG_2_FILE("TSRG v2 file", "tsrg", true, FeatureSetBuilder.createFrom(TSRG_FILE.features)
 			.withNamespaces(true)
@@ -209,8 +201,7 @@ public enum MappingFormat {
 	/**
 	 * ProGuard's mapping format, as specified <a href="https://www.guardsquare.com/manual/tools/retrace">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Line numbers are currently not supported.
+	 * @implNote Line numbers are currently not supported.
 	 */
 	PROGUARD_FILE("ProGuard file", "txt", true, FeatureSetBuilder.create()
 			.withElementMetadata(MetadataSupport.FIXED) // line numbers
@@ -230,6 +221,8 @@ public enum MappingFormat {
 
 	/**
 	 * The IntelliJ IDEA migration map format, as implemented <a href="https://github.com/JetBrains/intellij-community/tree/5b6191dd34e05de8897f5da68757146395a260cc/java/java-impl-refactorings/src/com/intellij/refactoring/migration">here</a>.
+	 *
+	 * @implNote Package mappings and file metadata are currently not supported.
 	 */
 	INTELLIJ_MIGRATION_MAP_FILE("IntelliJ migration map file", "xml", true, FeatureSetBuilder.create()
 			.withFileMetadata(MetadataSupport.FIXED) // migration map name and description
@@ -261,10 +254,9 @@ public enum MappingFormat {
 			.withFileComments(true)),
 
 	/**
-	 * The {@code JOBF} mapping format, as specified <a href="https://github.com/skylot/jadx/blob/2d5c0fda4a0c5d16207a5f48edb72e6efa7d5bbd/jadx-core/src/main/java/jadx/core/deobf/DeobfPresets.java">here</a>.
+	 * The {@code JOBF} mapping format, as implemented <a href="https://github.com/skylot/jadx/blob/2d5c0fda4a0c5d16207a5f48edb72e6efa7d5bbd/jadx-core/src/main/java/jadx/core/deobf/DeobfPresets.java">here</a>.
 	 *
-	 * <h2>Implementation notes</h2>
-	 * Package mappings are currently not supported.
+	 * @implNote Package mappings are currently not supported.
 	 */
 	JOBF_FILE("JOBF file", "jobf", true, FeatureSetBuilder.create()
 			.withPackages(p -> p
