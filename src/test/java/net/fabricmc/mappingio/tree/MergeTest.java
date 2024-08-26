@@ -292,4 +292,3 @@ public class MergeTest {
 		referenceTree.accept(new FlatAsRegularMappingVisitor(new SubsetAssertingVisitor(tree, null, null)));
 	}
 }
-

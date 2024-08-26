@@ -42,6 +42,7 @@
 		if <something> is a space, indicating a formatting error or ' */', it'll ignore the instance
 		if <something> is a tab, indicating a continued line, it'll ignore the instance
 		<control statement> is 'if', 'do', 'while', 'for', 'try' or nothing (instance initializer block)
+
 		- first \n: with positive lookbehind (?<=\n) to move the error marker to a more reasonable place
 		- capture tabs for <indentation>, later referenced via \1
 		- remaining preceding line as a non-comment (doesn't start with '/', '//', ' ' or '\t') or multiple lines where all but the first are a single line comment with the same indentation
@@ -61,6 +62,13 @@
 	</module>
 
 	<module name="TreeWalker">
+        <!-- Allow "//CHECKSTYLE.OFF: <InspectionName>" and "//CHECKSTYLE.ON: <InspectionName>" pairs to toggle some inspections -->
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
+            <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
+            <property name="checkFormat" value="$1"/>
+        </module>
+
 		<!-- Ensure all imports are ship shape -->
 		<module name="AvoidStarImport"/>
 		<module name="IllegalImport"/>
@@ -69,7 +77,7 @@
 
 		<module name="ImportOrder">
 			<property name="groups" value="java,javax,*,net.minecraft,net.fabricmc"/>
-			<property name="ordered" value="false"/><!-- the plugin orders alphabetically without considering separators.. -->
+			<property name="ordered" value="true"/>
 			<property name="separated" value="true"/>
 			<property name="option" value="top"/>
 			<property name="sortStaticImportsAlphabetically" value="true"/>
@@ -162,10 +170,10 @@
 		<module name="AtclauseOrder">
 			<property name="tagOrder" value="@param,@return,@throws,@deprecated"/>
 		</module>
-	</module>
 
-	<module name="SuppressionSingleFilter">
-        <property name="files" value="net[\\/]fabricmc[\\/]loader[\\/]lib[\\/]"/>
-    <property name="checks" value=".*"/>
-</module>
+        <!-- Prevent var for all cases other than new instance creation -->
+        <module name="MatchXpath">
+            <property name="query" value="//VARIABLE_DEF[./TYPE/IDENT[@text='var'] and not(./ASSIGN/EXPR/LITERAL_NEW)]"/>
+        </module>
+	</module>
 </module>

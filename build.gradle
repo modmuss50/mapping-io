@@ -25,6 +25,21 @@ allprojects {
 		toolVersion = project.checkstyle_tool_version
 	}
 
+	spotless {
+		lineEndings = com.diffplug.spotless.LineEnding.UNIX
+
+		java {
+			licenseHeaderFile(rootProject.file("HEADER")).yearSeparator(", ")
+			removeUnusedImports()
+			importOrder('java', 'javax', '', 'net.fabricmc')
+			indentWithTabs()
+			trimTrailingWhitespace()
+			targetExclude(
+					'src/test/java/net/fabricmc/mappingio/lib/**/*.java',
+					'src/main/java/net/fabricmc/mappingio/tree/AlphanumericComparator.java')
+		}
+	}
+
 	repositories {
 		mavenCentral()
 	}
@@ -39,14 +54,6 @@ allprojects {
 		testImplementation "org.junit.jupiter:junit-jupiter:${junit_jupiter_version}"
 		testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 		testCompileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
-	}
-
-	spotless {
-		java {
-			licenseHeaderFile(rootProject.file("HEADER")).yearSeparator(", ")
-			targetExclude 'src/test/java/net/fabricmc/mappingio/lib/**/*.java',
-			              'src/main/java/net/fabricmc/mappingio/tree/AlphanumericComparator.java'
-		}
 	}
 
 	java {
