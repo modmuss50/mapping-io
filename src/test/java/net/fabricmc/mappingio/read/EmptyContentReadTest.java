@@ -110,11 +110,11 @@ public class EmptyContentReadTest {
 		String header5 = header4 + "dstNs";
 
 		TsrgFileReader.read(new StringReader(header0), target); // interpreted as TSRG v1
+		instantiateTree();
 		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header1), target));
 		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header2), target));
 		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header3), target));
 		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header4), target));
-		instantiateTree();
 		TsrgFileReader.read(new StringReader(header5), target);
 	}
 
@@ -122,10 +122,10 @@ public class EmptyContentReadTest {
 	public void emptyMigrationMapFile() throws Exception {
 		assertThrows(IOException.class, () -> MigrationMapFileReader.read(new StringReader(""), target));
 
-		instantiateTree();
+		target.reset();
 		assertThrows(IOException.class, () -> MigrationMapFileReader.read(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"), target));
 
-		instantiateTree();
+		target.reset();
 		MigrationMapFileReader.read(
 				new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 						+ "<migrationMap>\n"

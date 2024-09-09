@@ -58,6 +58,12 @@ public class VisitOrderVerifyingVisitor extends ForwardingMappingVisitor {
 		resetLastSrcInfoDownTo(0);
 	}
 
+	@Override
+	public void reset() {
+		init();
+		super.reset();
+	}
+
 	private void resetVisitedElementContentDownTo(int inclusiveLevel) {
 		for (int i = visitedElementContent.length - 1; i >= inclusiveLevel; i--) {
 			visitedElementContent[i] = false;

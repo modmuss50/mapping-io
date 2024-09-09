@@ -625,6 +625,7 @@ public final class TestHelper {
 		public static final Path VALID = getResource("/read/valid/");
 		public static final Path REPEATED_ELEMENTS = getResource("/read/repeated-elements/");
 		public static final Path VALID_WITH_HOLES = getResource("/read/valid-with-holes/");
+		public static final Path MERGING = getResource("/merging/");
 	}
 
 	private static final List<String> fldDescs = Arrays.asList("I", "Lcls;", "Lpkg/cls;", "[I");

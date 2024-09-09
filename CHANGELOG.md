@@ -12,7 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Made some internal methods in Enigma and TSRG readers actually private
 - Made all writers for formats which can't represent empty destination names skip such elements entirely, unless mapped child elements are present
 - Added missing `visitElementContent` calls to CSRG and Recaf Simple readers
-- Fixed member mapping merging via tree-API in `MemoryMappingTree`
+- Added protection to `MemoryMappingTree` guarding against external data modification while a visitation pass is in progress
+- Clearly defined Tree-API contracts regarding returned collections' mutability
+- Fixed `MemoryMappingTree#reset` to actually reset all its internal state related to the current visitation pass
+- Fixed and improved `MemoryMappingTree`'s merging capabilities:
+  - Fixed broken member mapping merging via tree-API in `MemoryMappingTree`
+  - Fixed existing entries' data not getting overridden when merging elements into `MemoryMappingTree` via tree-API
+  - Fixed NPE when visiting with flipped namespaces ([issue 68](https://github.com/FabricMC/mapping-io/issues/68))
+  - Made merging with flipped namespaces actually work and handle both names and descriptors
+  - Fixed potentially incorrect descriptor computation by delaying until all classes are present and merged
 - Fixed duplicate mapping definitions not being handled correctly in multiple readers
 - Removed ASM dependency from core project
 
