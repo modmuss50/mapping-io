@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +34,9 @@ import net.fabricmc.mappingio.tree.MappingTreeView.MethodVarMappingView;
 
 /**
  * Visitation order configuration for {@link MappingTreeView#accept(net.fabricmc.mappingio.MappingVisitor, VisitOrder)}.
+ *
+ * @apiNote The exposed comparison methods aim to produce the most human-friendly output,
+ * their sorting order is not guaranteed to be stable across library versions unless specified otherwise.
  */
 public final class VisitOrder {
 	private VisitOrder() {
@@ -44,6 +48,11 @@ public final class VisitOrder {
 		return new VisitOrder();
 	}
 
+	/**
+	 * Sorts classes by their source name, members by source name and descriptor, and locals by lv- and lvt-index.
+	 *
+	 * @apiNote The sorting order is not guaranteed to be stable across library versions.
+	 */
 	public static VisitOrder createByName() {
 		return new VisitOrder()
 				.classesBySrcName()
@@ -63,6 +72,10 @@ public final class VisitOrder {
 
 	public VisitOrder classesBySrcName() {
 		return classComparator(compareBySrcName());
+	}
+
+	public VisitOrder classesBySrcNameShortFirst() {
+		return classComparator(compareBySrcNameShortFirst());
 	}
 
 	public VisitOrder fieldComparator(Comparator<FieldMappingView> comparator) {
@@ -106,11 +119,16 @@ public final class VisitOrder {
 	}
 
 	public VisitOrder methodVarsByLvtRowIndex() {
-		return methodVarComparator(Comparator.comparingInt(MethodVarMappingView::getLvIndex).thenComparingInt(MethodVarMappingView::getLvtRowIndex));
+		return methodVarComparator(Comparator
+				.comparingInt(MethodVarMappingView::getLvIndex)
+				.thenComparingInt(MethodVarMappingView::getLvtRowIndex));
 	}
 
 	public VisitOrder methodVarsByLvIndex() {
-		return methodVarComparator(Comparator.comparingInt(MethodVarMappingView::getLvIndex).thenComparingInt(MethodVarMappingView::getStartOpIdx));
+		return methodVarComparator(Comparator
+				.comparingInt(MethodVarMappingView::getLvIndex)
+				.thenComparingInt(MethodVarMappingView::getStartOpIdx)
+				.thenComparingInt(MethodVarMappingView::getEndOpIdx));
 	}
 
 	public VisitOrder methodsFirst(boolean methodsFirst) {
@@ -141,10 +159,16 @@ public final class VisitOrder {
 		return methodVarsFirst(true);
 	}
 
-	// customization helpers
+	// customization helpers (not guaranteed to be stable across versions)
 
 	public static <T extends ElementMappingView> Comparator<T> compareBySrcName() {
-		return (a, b) -> compare(a.getSrcName(), b.getSrcName());
+		return (a, b) -> {
+			if (a instanceof ClassMappingView || b instanceof ClassMappingView) {
+				return compareNestaware(a.getSrcName(), b.getSrcName(), false);
+			} else {
+				return compare(a.getSrcName(), b.getSrcName());
+			}
+		};
 	}
 
 	public static <T extends MemberMappingView> Comparator<T> compareBySrcNameDesc() {
@@ -156,13 +180,31 @@ public final class VisitOrder {
 	}
 
 	public static <T extends ElementMappingView> Comparator<T> compareBySrcNameShortFirst() {
-		return (a, b) -> compareShortFirst(a.getSrcName(), b.getSrcName());
+		return (a, b) -> {
+			if (a instanceof ClassMappingView || b instanceof ClassMappingView) {
+				return compareNestaware(a.getSrcName(), b.getSrcName(), true);
+			} else {
+				return compareShortFirst(a.getSrcName(), b.getSrcName());
+			}
+		};
+	}
+
+	public static <T extends MemberMappingView> Comparator<T> compareBySrcNameDescShortFirst() {
+		return (a, b) -> {
+			int cmp = compareShortFirst(a.getSrcName(), b.getSrcName());
+
+			return cmp != 0 ? cmp : compare(a.getSrcDesc(), b.getSrcDesc());
+		};
 	}
 
 	public static int compare(@Nullable String a, @Nullable String b) {
 		if (a == null || b == null) return compareNullLast(a, b);
 
-		return a.compareTo(b);
+		return ALPHANUM.compare(a, b);
+	}
+
+	public static int compare(String a, int startA, int endA, String b, int startB, int endB) {
+		return ALPHANUM.compare(a.substring(startA, endA), b.substring(startB, endB));
 	}
 
 	public static int compareShortFirst(@Nullable String a, @Nullable String b) {
@@ -170,7 +212,7 @@ public final class VisitOrder {
 
 		int cmp = a.length() - b.length();
 
-		return cmp != 0 ? cmp : a.compareTo(b);
+		return cmp != 0 ? cmp : ALPHANUM.compare(a, b);
 	}
 
 	public static int compareShortFirst(String a, int startA, int endA, String b, int startB, int endB) {
@@ -178,19 +220,18 @@ public final class VisitOrder {
 		int ret = Integer.compare(lenA, endB - startB);
 		if (ret != 0) return ret;
 
-		for (int i = 0; i < lenA; i++) {
-			char ca = a.charAt(startA + i);
-			char cb = b.charAt(startB + i);
+		return ALPHANUM.compare(a.substring(startA, endA), b.substring(startB, endB));
+	}
 
-			if (ca != cb) {
-				return ca - cb;
-			}
-		}
-
-		return 0;
+	public static int compareNestaware(@Nullable String a, @Nullable String b) {
+		return compareNestaware(a, b, false);
 	}
 
 	public static int compareShortFirstNestaware(@Nullable String a, @Nullable String b) {
+		return compareNestaware(a, b, true);
+	}
+
+	private static int compareNestaware(@Nullable String a, @Nullable String b, boolean shortFirst) {
 		if (a == null || b == null) {
 			return compareNullLast(a, b);
 		}
@@ -201,8 +242,11 @@ public final class VisitOrder {
 			int endA = a.indexOf('$', pos);
 			int endB = b.indexOf('$', pos);
 
-			int ret = compareShortFirst(a, pos, endA >= 0 ? endA : a.length(),
-					b, pos, endB >= 0 ? endB : b.length());
+			int ret = shortFirst
+					? compareShortFirst(a, pos, endA >= 0 ? endA : a.length(),
+							b, pos, endB >= 0 ? endB : b.length())
+					: compare(a, pos, endA >= 0 ? endA : a.length(),
+							b, pos, endB >= 0 ? endB : b.length());
 
 			if (ret != 0) {
 				return ret;
@@ -226,7 +270,7 @@ public final class VisitOrder {
 		} else if (b == null) { // only b null
 			return -1;
 		} else { // neither null
-			return a.compareTo(b);
+			return ALPHANUM.compare(a, b);
 		}
 	}
 
@@ -269,6 +313,7 @@ public final class VisitOrder {
 		return methodVarsFirst;
 	}
 
+	private static final AlphanumericComparator ALPHANUM = new AlphanumericComparator(Locale.ROOT);
 	private Comparator<ClassMappingView> classComparator;
 	private Comparator<FieldMappingView> fieldComparator;
 	private Comparator<MethodMappingView> methodComparator;
