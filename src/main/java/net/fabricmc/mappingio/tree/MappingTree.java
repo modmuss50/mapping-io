@@ -21,6 +21,9 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.mappingio.adapter.MappingDstNsReorder;
+import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch;
+
 /**
  * Mutable mapping tree.
  *
@@ -28,15 +31,31 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface MappingTree extends MappingTreeView {
 	/**
-	 * Sets the tree's and all of its contained elements' source namespace.
+	 * Sets the tree's and all of its contained elements' source namespace name.
 	 *
-	 * @return The previous source namespace, if present.
+	 * <p>If the passed namespace name equals an existing destination namespace's name,
+	 * implementors may choose to switch the two namespaces around, analogous to {@link MappingSourceNsSwitch}.
+	 * This has to be made clear in the implementation's documentation.
+	 *
+	 * @implSpec If switching with an existing destination namespace is requested, but not supported, an {@link UnsupportedOperationException} must be thrown.
+	 *
+	 * @return The previous source namespace name, if present.
 	 */
 	@Nullable
 	String setSrcNamespace(String namespace);
 
 	/**
+	 * Sets the tree's and all of its contained elements' destination namespace names.
+	 *
+	 * <p>Can be used to reorder and/or drop destination namespaces, analogous to {@link MappingDstNsReorder}.
+	 *
+	 * <p>Implementors may allow switching with the source namespace as well, analogous to {@link MappingSourceNsSwitch}.
+	 * This has to be made clear in the implementation's documentation.
+	 *
+	 * @implSpec If switching with the source namespace is requested, but not supported, an {@link UnsupportedOperationException} must be thrown.
+	 *
 	 * @return The previous destination namespaces.
+	 * @throws IllegalArgumentException If the passed namespace names contain duplicates.
 	 */
 	List<String> setDstNamespaces(List<String> namespaces);
 

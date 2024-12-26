@@ -39,9 +39,13 @@ import org.jetbrains.annotations.Nullable;
 import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingFlag;
 import net.fabricmc.mappingio.MappingVisitor;
+import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch;
 
 /**
  * {@link VisitableMappingTree} implementation that stores all data in memory.
+ *
+ * <p>Switching the source namespace with an existing destination namespace via
+ * {@link #setSrcNamespace(String)} or {@link #setDstNamespaces(List)} is not supported yet.
  */
 public final class MemoryMappingTree implements VisitableMappingTree {
 	public MemoryMappingTree() {
@@ -118,13 +122,25 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 		return srcNamespace;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @throws UnsupportedOperationException If the passed namespace name is already in use by one of the destination namespaces. This may change in a future release.
+	 */
 	@Override
 	@Nullable
 	public String setSrcNamespace(String namespace) {
 		assertNotInVisitPass();
+
+		if (dstNamespaces.contains(namespace)) {
+			throw new UnsupportedOperationException(String.format(
+					"Can't use name \"%s\" for the source namespace, as it's already in use by one of the destination namespaces %s."
+					+ " If a source namespace shuffle was the desired outcome, please resort to a %s instead; %s doesn't support this operation natively yet.",
+					namespace, dstNamespaces, MappingSourceNsSwitch.class.getSimpleName(), getClass().getSimpleName()));
+		}
+
 		String ret = srcNamespace;
 		srcNamespace = namespace;
-
 		return ret;
 	}
 
@@ -133,6 +149,12 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 		return dstNamespaces;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @throws IllegalArgumentException If the passed namespace names contain duplicates.
+	 * @throws UnsupportedOperationException If the passed namespace names contain the source namespace's name. This may change in a future release.
+	 */
 	@Override
 	public List<String> setDstNamespaces(List<String> namespaces) {
 		assertNotInVisitPass();
@@ -140,16 +162,31 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 		if (!classesBySrcName.isEmpty()) { // classes present, update existing dstNames
 			int newSize = namespaces.size();
 			int[] nameMap = new int[newSize];
+			Set<String> processedNamespaces = new HashSet<>(newSize);
+			Set<String> duplicateNamespaces = new HashSet<>(newSize);
 
 			for (int i = 0; i < newSize; i++) {
 				String newNs = namespaces.get(i);
 
 				if (newNs.equals(srcNamespace)) {
-					throw new IllegalArgumentException("can't use the same namespace for src and dst");
+					throw new UnsupportedOperationException(String.format(
+							"Can't use name \"%s\" for destination namespace %s, as it's already in use by the source namespace."
+							+ " If a source namespace shuffle was the desired outcome, please resort to a %s instead; %s doesn't support this operation natively yet.",
+							newNs, i, MappingSourceNsSwitch.class.getSimpleName(), getClass().getSimpleName()));
 				} else {
 					int oldNsIdx = dstNamespaces.indexOf(newNs);
 					nameMap[i] = oldNsIdx;
 				}
+
+				if (processedNamespaces.contains(newNs)) {
+					duplicateNamespaces.add(newNs);
+				}
+
+				processedNamespaces.add(newNs);
+			}
+
+			if (!duplicateNamespaces.isEmpty()) {
+				throw new IllegalArgumentException("Duplicate destination namespace names: " + duplicateNamespaces);
 			}
 
 			boolean useResize = true;
