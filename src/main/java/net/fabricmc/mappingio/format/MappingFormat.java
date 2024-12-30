@@ -40,7 +40,8 @@ public enum MappingFormat {
 			.withFileMetadata(MetadataSupport.FIXED) // TODO: change this to ARBITRARY once https://github.com/FabricMC/mapping-io/pull/29 is merged
 			.withClasses(c -> c
 					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.OPTIONAL))
+					.withDstNames(FeaturePresence.OPTIONAL)
+					.withRepackaging(true))
 			.withFields(f -> f
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withDstNames(FeaturePresence.OPTIONAL)
@@ -59,7 +60,8 @@ public enum MappingFormat {
 			.withFileMetadata(MetadataSupport.ARBITRARY)
 			.withClasses(c -> c
 					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.OPTIONAL))
+					.withDstNames(FeaturePresence.OPTIONAL)
+					.withRepackaging(true))
 			.withFields(f -> f
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withDstNames(FeaturePresence.OPTIONAL)
@@ -91,7 +93,8 @@ public enum MappingFormat {
 			.withElementMetadata(MetadataSupport.FIXED) // access modifiers
 			.withClasses(c -> c
 					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.OPTIONAL))
+					.withDstNames(FeaturePresence.OPTIONAL)
+					.withRepackaging(true))
 			.withFields(f -> f
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withDstNames(FeaturePresence.OPTIONAL)
@@ -126,7 +129,8 @@ public enum MappingFormat {
 					.withDstNames(FeaturePresence.REQUIRED))
 			.withClasses(c -> c
 					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.REQUIRED))
+					.withDstNames(FeaturePresence.REQUIRED)
+					.withRepackaging(true))
 			.withFields(f -> f
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withDstNames(FeaturePresence.REQUIRED))
@@ -212,7 +216,8 @@ public enum MappingFormat {
 			.withElementMetadata(MetadataSupport.FIXED) // line numbers
 			.withClasses(c -> c
 					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.REQUIRED))
+					.withDstNames(FeaturePresence.REQUIRED)
+					.withRepackaging(true))
 			.withFields(f -> f
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withDstNames(FeaturePresence.REQUIRED)
@@ -233,7 +238,8 @@ public enum MappingFormat {
 					.withDstNames(FeaturePresence.REQUIRED))
 			.withClasses(c -> c
 					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.REQUIRED))
+					.withDstNames(FeaturePresence.REQUIRED)
+					.withRepackaging(true))
 			.withFileComments(true)),
 
 	/**
@@ -242,7 +248,8 @@ public enum MappingFormat {
 	RECAF_SIMPLE_FILE("Recaf Simple file", "txt", true, FeatureSetBuilder.create()
 			.withClasses(c -> c
 					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.REQUIRED))
+					.withDstNames(FeaturePresence.REQUIRED)
+					.withRepackaging(true))
 			.withFields(f -> f
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withSrcDescs(FeaturePresence.OPTIONAL)
@@ -260,7 +267,7 @@ public enum MappingFormat {
 	 * Package mappings are currently not supported.
 	 */
 	JOBF_FILE("JOBF file", "jobf", true, FeatureSetBuilder.create()
-			.withPackages(c -> c
+			.withPackages(p -> p
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withDstNames(FeaturePresence.REQUIRED))
 			.withClasses(c -> c

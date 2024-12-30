@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Made merging with flipped namespaces actually work and handle both names and descriptors
   - Fixed potentially incorrect descriptor computation by delaying until all classes are present and merged
 - Fixed duplicate mapping definitions not being handled correctly in multiple readers
+- Fixed incorrect handling of class repackaging in JOBF reader and writer
 - Removed ASM dependency from core project
 
 ## [0.6.1] - 2024-04-15

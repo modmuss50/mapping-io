@@ -17,7 +17,7 @@
 package net.fabricmc.mappingio.format;
 
 class FeatureSetImpl implements FeatureSet {
-	FeatureSetImpl(boolean hasNamespaces, MetadataSupport fileMetadata, MetadataSupport elementMetadata, NameSupport packages, NameSupport classes, MemberSupport fields, MemberSupport methods, LocalSupport args, LocalSupport vars, ElementCommentSupport elementComments, boolean hasFileComments) {
+	FeatureSetImpl(boolean hasNamespaces, MetadataSupport fileMetadata, MetadataSupport elementMetadata, NameSupport packages, ClassSupport classes, MemberSupport fields, MemberSupport methods, LocalSupport args, LocalSupport vars, ElementCommentSupport elementComments, boolean hasFileComments) {
 		this.hasNamespaces = hasNamespaces;
 		this.fileMetadata = fileMetadata;
 		this.elementMetadata = elementMetadata;
@@ -52,7 +52,7 @@ class FeatureSetImpl implements FeatureSet {
 	}
 
 	@Override
-	public NameSupport classes() {
+	public ClassSupport classes() {
 		return classes;
 	}
 
@@ -90,7 +90,7 @@ class FeatureSetImpl implements FeatureSet {
 	private final MetadataSupport fileMetadata;
 	private final MetadataSupport elementMetadata;
 	private final NameSupport packages;
-	private final NameSupport classes;
+	private final ClassSupport classes;
 	private final MemberSupport fields;
 	private final MemberSupport methods;
 	private final LocalSupport args;
@@ -98,20 +98,24 @@ class FeatureSetImpl implements FeatureSet {
 	private final ElementCommentSupport elementComments;
 	private final boolean hasFileComments;
 
-	static class MemberSupportImpl implements MemberSupport {
+	static class ClassSupportImpl extends NameSupportImpl implements ClassSupport {
+		ClassSupportImpl(NameSupport names, boolean hasRepackaging) {
+			super(names.srcNames(), names.dstNames());
+			this.hasRepackaging = hasRepackaging;
+		}
+
+		@Override
+		public boolean hasRepackaging() {
+			return hasRepackaging;
+		}
+
+		private final boolean hasRepackaging;
+	}
+
+	static class MemberSupportImpl extends NameSupportImpl implements MemberSupport {
 		MemberSupportImpl(NameSupport names, DescSupport descriptors) {
-			this.names = names;
+			super(names.srcNames(), names.dstNames());
 			this.descriptors = descriptors;
-		}
-
-		@Override
-		public FeaturePresence srcNames() {
-			return names.srcNames();
-		}
-
-		@Override
-		public FeaturePresence dstNames() {
-			return names.dstNames();
 		}
 
 		@Override
@@ -124,18 +128,17 @@ class FeatureSetImpl implements FeatureSet {
 			return descriptors.dstDescs();
 		}
 
-		private final NameSupport names;
 		private final DescSupport descriptors;
 	}
 
-	static class LocalSupportImpl implements LocalSupport {
+	static class LocalSupportImpl extends NameSupportImpl implements LocalSupport {
 		LocalSupportImpl(FeaturePresence positions, FeaturePresence lvIndices, FeaturePresence lvtRowIndices, FeaturePresence startOpIndices, FeaturePresence endOpIndices, NameSupport names, DescSupport descriptors) {
+			super(names.srcNames(), names.dstNames());
 			this.positions = positions;
 			this.lvIndices = lvIndices;
 			this.lvtRowIndices = lvtRowIndices;
 			this.startOpIndices = startOpIndices;
 			this.endOpIndices = endOpIndices;
-			this.names = names;
 			this.descriptors = descriptors;
 		}
 
@@ -165,16 +168,6 @@ class FeatureSetImpl implements FeatureSet {
 		}
 
 		@Override
-		public FeaturePresence srcNames() {
-			return names.srcNames();
-		}
-
-		@Override
-		public FeaturePresence dstNames() {
-			return names.dstNames();
-		}
-
-		@Override
 		public FeaturePresence srcDescs() {
 			return descriptors.srcDescs();
 		}
@@ -189,7 +182,6 @@ class FeatureSetImpl implements FeatureSet {
 		private final FeaturePresence lvtRowIndices;
 		private final FeaturePresence startOpIndices;
 		private final FeaturePresence endOpIndices;
-		private final NameSupport names;
 		private final DescSupport descriptors;
 	}
 

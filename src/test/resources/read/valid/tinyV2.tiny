@@ -8,4 +8,4 @@ c	class_1	class1Ns0Rename	class1Ns1Rename
 c	class_1$class_2	class1Ns0Rename$class2Ns0Rename	class1Ns1Rename$class2Ns1Rename
 	c	This is a comment
 	f	Lcls;	field_2	field2Ns0Rename	field2Ns1Rename
-c	class_3	class3Ns0Rename	class3Ns1Rename
+c	class_3	package_3/class3Ns0Rename	package_3/class3Ns1Rename

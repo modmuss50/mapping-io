@@ -53,7 +53,8 @@ public final class JobfFileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitClass(String srcName) throws IOException {
-		classSrcName = srcName.replace('/', '.');
+		classSrcName = srcName;
+		dstName = null;
 
 		return true;
 	}
@@ -62,6 +63,7 @@ public final class JobfFileWriter implements MappingWriter {
 	public boolean visitField(String srcName, @Nullable String srcDesc) throws IOException {
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
+		dstName = null;
 
 		return true;
 	}
@@ -70,6 +72,7 @@ public final class JobfFileWriter implements MappingWriter {
 	public boolean visitMethod(String srcName, @Nullable String srcDesc) throws IOException {
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
+		dstName = null;
 
 		return true;
 	}
@@ -99,6 +102,15 @@ public final class JobfFileWriter implements MappingWriter {
 		if (dstName == null) return isClass;
 
 		if ((isClass)) {
+			int srcNameLastSep = classSrcName.lastIndexOf('/');
+			int dstNameLastSep = dstName.lastIndexOf('/');
+			String srcPkg = classSrcName.substring(0, srcNameLastSep + 1);
+			String dstPkg = dstName.substring(0, dstNameLastSep + 1);
+
+			classSrcName = classSrcName.replace('/', '.');
+			if (!srcPkg.equals(dstPkg)) return true; // JOBF doesn't support renaming into a different package
+
+			dstName = dstName.substring(dstNameLastSep + 1);
 			write("c ");
 		} else if ((isField = targetKind == MappedElementKind.FIELD)
 				|| targetKind == MappedElementKind.METHOD) {
@@ -123,7 +135,6 @@ public final class JobfFileWriter implements MappingWriter {
 
 		writeLn();
 
-		dstName = null;
 		return isClass; // only members are supported, skip anything but class contents
 	}
 

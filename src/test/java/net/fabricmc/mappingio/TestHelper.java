@@ -23,7 +23,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import net.neoforged.srgutils.IMappingFile;
 import org.cadixdev.lorenz.io.MappingFormats;
@@ -159,23 +158,23 @@ public final class TestHelper {
 
 		if (delegate.visitContent()) {
 			int[] dstNs = new int[] { 0, 1 };
-			nameGen.reset();
+			NameGen nameGen = new NameGen();
 
-			if (visitClass(delegate, dstNs)) {
-				visitField(delegate, dstNs);
+			if (nameGen.visitClass(delegate, dstNs)) {
+				nameGen.visitField(delegate, dstNs);
 
-				if (visitMethod(delegate, dstNs)) {
-					visitMethodArg(delegate, dstNs);
-					visitMethodVar(delegate, dstNs);
+				if (nameGen.visitMethod(delegate, dstNs)) {
+					nameGen.visitMethodArg(delegate, dstNs);
+					nameGen.visitMethodVar(delegate, dstNs);
 				}
 			}
 
-			if (visitInnerClass(delegate, 1, dstNs)) {
-				visitComment(delegate);
-				visitField(delegate, dstNs);
+			if (nameGen.visitInnerClass(delegate, 1, dstNs)) {
+				nameGen.visitComment(delegate);
+				nameGen.visitField(delegate, dstNs);
 			}
 
-			visitClass(delegate, dstNs);
+			nameGen.visitClass(delegate, dstNs);
 		}
 
 		if (!delegate.visitEnd()) {
@@ -286,97 +285,98 @@ public final class TestHelper {
 		}
 
 		if (delegate.visitContent()) {
-			nameGen.reset();
+			NameGen nameGen = new NameGen();
 
 			// (Inner) Classes
 			for (int nestLevel = 0; nestLevel <= 2; nestLevel++) {
-				visitClass(delegate);
-				visitInnerClass(delegate, nestLevel, 0);
-				visitInnerClass(delegate, nestLevel, 1);
+				nameGen.visitClass(delegate);
+				nameGen.visitClass(delegate);
+				nameGen.visitInnerClass(delegate, nestLevel, 0);
+				nameGen.visitInnerClass(delegate, nestLevel, 1);
 
-				if (visitInnerClass(delegate, nestLevel)) {
-					visitComment(delegate);
+				if (nameGen.visitInnerClass(delegate, nestLevel)) {
+					nameGen.visitComment(delegate);
 				}
 
-				if (visitInnerClass(delegate, nestLevel, 0)) {
-					visitComment(delegate);
+				if (nameGen.visitInnerClass(delegate, nestLevel, 0)) {
+					nameGen.visitComment(delegate);
 				}
 
-				if (visitInnerClass(delegate, nestLevel, 1)) {
-					visitComment(delegate);
+				if (nameGen.visitInnerClass(delegate, nestLevel, 1)) {
+					nameGen.visitComment(delegate);
 				}
 			}
 
-			if (visitClass(delegate)) {
+			if (nameGen.visitClass(delegate)) {
 				// Fields
-				visitField(delegate);
-				visitField(delegate, 0);
-				visitField(delegate, 1);
+				nameGen.visitField(delegate);
+				nameGen.visitField(delegate, 0);
+				nameGen.visitField(delegate, 1);
 
-				if (visitField(delegate)) {
-					visitComment(delegate);
+				if (nameGen.visitField(delegate)) {
+					nameGen.visitComment(delegate);
 				}
 
-				if (visitField(delegate, 0)) {
-					visitComment(delegate);
+				if (nameGen.visitField(delegate, 0)) {
+					nameGen.visitComment(delegate);
 				}
 
-				if (visitField(delegate, 1)) {
-					visitComment(delegate);
+				if (nameGen.visitField(delegate, 1)) {
+					nameGen.visitComment(delegate);
 				}
 
 				// Methods
-				visitMethod(delegate);
-				visitMethod(delegate, 0);
-				visitMethod(delegate, 1);
+				nameGen.visitMethod(delegate);
+				nameGen.visitMethod(delegate, 0);
+				nameGen.visitMethod(delegate, 1);
 
-				if (visitMethod(delegate)) {
-					visitComment(delegate);
+				if (nameGen.visitMethod(delegate)) {
+					nameGen.visitComment(delegate);
 				}
 
-				if (visitMethod(delegate, 0)) {
-					visitComment(delegate);
+				if (nameGen.visitMethod(delegate, 0)) {
+					nameGen.visitComment(delegate);
 				}
 
-				if (visitMethod(delegate, 1)) {
-					visitComment(delegate);
+				if (nameGen.visitMethod(delegate, 1)) {
+					nameGen.visitComment(delegate);
 				}
 
 				// Method args
-				if (visitMethod(delegate)) {
-					visitMethodArg(delegate);
-					visitMethodArg(delegate, 1);
-					visitMethodArg(delegate, 0);
+				if (nameGen.visitMethod(delegate)) {
+					nameGen.visitMethodArg(delegate);
+					nameGen.visitMethodArg(delegate, 1);
+					nameGen.visitMethodArg(delegate, 0);
 
-					if (visitMethodArg(delegate)) {
-						visitComment(delegate);
+					if (nameGen.visitMethodArg(delegate)) {
+						nameGen.visitComment(delegate);
 					}
 
-					if (visitMethodArg(delegate, 0)) {
-						visitComment(delegate);
+					if (nameGen.visitMethodArg(delegate, 0)) {
+						nameGen.visitComment(delegate);
 					}
 
-					if (visitMethodArg(delegate, 1)) {
-						visitComment(delegate);
+					if (nameGen.visitMethodArg(delegate, 1)) {
+						nameGen.visitComment(delegate);
 					}
 				}
 
 				// Method vars
-				if (visitMethod(delegate)) {
-					visitMethodVar(delegate);
-					visitMethodVar(delegate, 1);
-					visitMethodVar(delegate, 0);
+				if (nameGen.visitMethod(delegate)) {
+					nameGen.visitMethodVar(delegate);
+					nameGen.visitMethodVar(delegate, 1);
+					nameGen.visitMethodVar(delegate, 0);
 
-					if (visitMethodVar(delegate)) {
-						visitComment(delegate);
+					if (nameGen.visitMethodVar(delegate)) {
+						nameGen.visitComment(delegate);
 					}
 
-					if (visitMethodVar(delegate, 0)) {
-						visitComment(delegate);
+					if (nameGen.visitMethodVar(delegate, 0)) {
+						nameGen.visitComment(delegate);
 					}
 
-					if (visitMethodVar(delegate, 1)) {
-						visitComment(delegate);
+					if (nameGen.visitMethodVar(delegate, 1)) {
+						nameGen.visitComment(delegate);
 					}
 				}
 			}
@@ -387,229 +387,6 @@ public final class TestHelper {
 		}
 
 		return target;
-	}
-
-	private static boolean visitClass(MappingVisitor target, int... dstNs) throws IOException {
-		return visitInnerClass(target, 0, dstNs);
-	}
-
-	private static boolean visitInnerClass(MappingVisitor target, int nestLevel, int... dstNs) throws IOException {
-		if (!target.visitClass(nestLevel <= 0 ? nameGen.src(clsKind) : nameGen.srcInnerCls(nestLevel))) {
-			return false;
-		}
-
-		for (int ns : dstNs) {
-			target.visitDstName(clsKind, ns, nameGen.dst(clsKind, ns));
-		}
-
-		return target.visitElementContent(clsKind);
-	}
-
-	private static boolean visitField(MappingVisitor target, int... dstNs) throws IOException {
-		String desc;
-
-		if (!target.visitField(nameGen.src(fldKind), desc = nameGen.desc(fldKind))) {
-			return false;
-		}
-
-		for (int ns : dstNs) {
-			target.visitDstName(fldKind, ns, nameGen.dst(fldKind, ns));
-			target.visitDstDesc(fldKind, ns, desc);
-		}
-
-		return target.visitElementContent(fldKind);
-	}
-
-	private static boolean visitMethod(MappingVisitor target, int... dstNs) throws IOException {
-		String desc;
-
-		if (!target.visitMethod(nameGen.src(mthKind), desc = nameGen.desc(mthKind))) {
-			return false;
-		}
-
-		for (int ns : dstNs) {
-			target.visitDstName(mthKind, ns, nameGen.dst(mthKind, ns));
-			target.visitDstDesc(mthKind, ns, desc);
-		}
-
-		return target.visitElementContent(mthKind);
-	}
-
-	private static boolean visitMethodArg(MappingVisitor target, int... dstNs) throws IOException {
-		if (!target.visitMethodArg(nameGen.getCounter().getAndIncrement(), nameGen.getCounter().getAndIncrement(), nameGen.src(argKind))) {
-			return false;
-		}
-
-		for (int ns : dstNs) {
-			target.visitDstName(argKind, ns, nameGen.dst(argKind, ns));
-		}
-
-		return target.visitElementContent(argKind);
-	}
-
-	private static boolean visitMethodVar(MappingVisitor target, int... dstNs) throws IOException {
-		if (!target.visitMethodVar(
-				nameGen.getCounter().get(),
-				nameGen.getCounter().get(),
-				nameGen.getCounter().getAndIncrement(),
-				nameGen.getCounter().getAndIncrement(),
-				nameGen.src(varKind))) {
-			return false;
-		}
-
-		for (int ns : dstNs) {
-			target.visitDstName(varKind, ns, nameGen.dst(varKind, ns));
-		}
-
-		return target.visitElementContent(varKind);
-	}
-
-	private static void visitComment(MappingVisitor target) throws IOException {
-		target.visitComment(nameGen.lastKind.get(), comment);
-	}
-
-	private static class NameGen {
-		public void reset() {
-			lastKind.remove();
-			innerClassNestLevel.remove();
-			clsNum.get().set(0);
-			fldNum.get().set(0);
-			mthNum.get().set(0);
-			argNum.get().set(0);
-			varNum.get().set(0);
-			nsNum.get().set(0);
-			counter.get().set(0);
-		}
-
-		private void resetNsNum() {
-			nsNum.get().set(0);
-		}
-
-		public String src(MappedElementKind kind) {
-			resetNsNum();
-			lastKind.set(kind);
-			innerClassNestLevel.set(0);
-
-			if (kind == MappedElementKind.CLASS) {
-				outerClassHasDst.set(false);
-			}
-
-			return getPrefix(kind) + "_" + getCounter(kind).incrementAndGet();
-		}
-
-		public String srcInnerCls(/* >=1 */ int nestLevel) {
-			if (innerClassNestLevel.get() == 0) clsNum.get().decrementAndGet();
-			boolean hasDst = outerClassHasDst.get();
-			StringBuilder sb = new StringBuilder(src(clsKind));
-
-			for (int i = 0; i < nestLevel; i++) {
-				sb.append('$');
-				sb.append(src(clsKind));
-			}
-
-			outerClassHasDst.set(hasDst);
-			innerClassNestLevel.set(nestLevel);
-			return sb.toString();
-		}
-
-		public String dst(MappedElementKind kind) {
-			return dst(kind, nsNum.get().getAndIncrement());
-		}
-
-		public String dst(MappedElementKind kind, int ns) {
-			if (lastKind != null && lastKind.get() != kind) {
-				throw new UnsupportedOperationException();
-			}
-
-			if (nsNum.get().get() < ns) nsNum.get().set(ns + 1);
-
-			if (innerClassNestLevel.get().intValue() == 0) {
-				outerClassHasDst.set(true);
-				return getPrefix(kind) + getCounter(kind).get() + "Ns" + ns + "Rename";
-			}
-
-			boolean hasDst = outerClassHasDst.get();
-			int nestLevel = innerClassNestLevel.get();
-			innerClassNestLevel.set(0);
-			StringBuilder sb = new StringBuilder(dst(kind, ns));
-
-			for (int i = nestLevel - 1; i >= 0; i--) {
-				sb.insert(0, '$');
-				clsNum.get().decrementAndGet();
-				if (!hasDst) clsNum.get().decrementAndGet();
-				sb.insert(0, hasDst ? dst(clsKind) : src(kind));
-			}
-
-			outerClassHasDst.set(hasDst);
-			innerClassNestLevel.set(nestLevel);
-			clsNum.get().addAndGet(nestLevel);
-			return sb.toString();
-		}
-
-		public String desc(MappedElementKind kind) {
-			switch (kind) {
-			case FIELD:
-				return fldDescs.get((fldNum.get().get() - 1) % fldDescs.size());
-			case METHOD:
-				return mthDescs.get((mthNum.get().get() - 1) % mthDescs.size());
-			default:
-				throw new IllegalArgumentException("Invalid kind: " + kind);
-			}
-		}
-
-		public AtomicInteger getCounter() {
-			return counter.get();
-		}
-
-		private AtomicInteger getCounter(MappedElementKind kind) {
-			switch (kind) {
-			case CLASS:
-				return clsNum.get();
-			case FIELD:
-				return fldNum.get();
-			case METHOD:
-				return mthNum.get();
-			case METHOD_ARG:
-				return argNum.get();
-			case METHOD_VAR:
-				return varNum.get();
-			default:
-				throw new IllegalArgumentException("Unknown kind: " + kind);
-			}
-		}
-
-		private String getPrefix(MappedElementKind kind) {
-			switch (kind) {
-			case CLASS:
-				return clsPrefix;
-			case FIELD:
-				return fldPrefix;
-			case METHOD:
-				return mthPrefix;
-			case METHOD_ARG:
-				return argPrefix;
-			case METHOD_VAR:
-				return varPrefix;
-			default:
-				throw new IllegalArgumentException("Unknown kind: " + kind);
-			}
-		}
-
-		private static final String clsPrefix = "class";
-		private static final String fldPrefix = "field";
-		private static final String mthPrefix = "method";
-		private static final String argPrefix = "param";
-		private static final String varPrefix = "var";
-		private ThreadLocal<MappedElementKind> lastKind = ThreadLocal.withInitial(() -> null);
-		private ThreadLocal<Boolean> outerClassHasDst = ThreadLocal.withInitial(() -> false);
-		private ThreadLocal<Integer> innerClassNestLevel = ThreadLocal.withInitial(() -> 0);
-		private ThreadLocal<AtomicInteger> clsNum = ThreadLocal.withInitial(() -> new AtomicInteger());
-		private ThreadLocal<AtomicInteger> fldNum = ThreadLocal.withInitial(() -> new AtomicInteger());
-		private ThreadLocal<AtomicInteger> mthNum = ThreadLocal.withInitial(() -> new AtomicInteger());
-		private ThreadLocal<AtomicInteger> argNum = ThreadLocal.withInitial(() -> new AtomicInteger());
-		private ThreadLocal<AtomicInteger> varNum = ThreadLocal.withInitial(() -> new AtomicInteger());
-		private ThreadLocal<AtomicInteger> nsNum = ThreadLocal.withInitial(() -> new AtomicInteger());
-		private ThreadLocal<AtomicInteger> counter = ThreadLocal.withInitial(() -> new AtomicInteger());
 	}
 
 	public static class MappingDirs {
@@ -627,14 +404,4 @@ public final class TestHelper {
 		public static final Path VALID_WITH_HOLES = getResource("/read/valid-with-holes/");
 		public static final Path MERGING = getResource("/merging/");
 	}
-
-	private static final List<String> fldDescs = Arrays.asList("I", "Lcls;", "Lpkg/cls;", "[I");
-	private static final List<String> mthDescs = Arrays.asList("()I", "(I)V", "(Lcls;)Lcls;", "(ILcls;)Lpkg/cls;", "(Lcls;[I)[[B");
-	private static final String comment = "This is a comment";
-	private static final NameGen nameGen = new NameGen();
-	private static final MappedElementKind clsKind = MappedElementKind.CLASS;
-	private static final MappedElementKind fldKind = MappedElementKind.FIELD;
-	private static final MappedElementKind mthKind = MappedElementKind.METHOD;
-	private static final MappedElementKind argKind = MappedElementKind.METHOD_ARG;
-	private static final MappedElementKind varKind = MappedElementKind.METHOD_VAR;
 }

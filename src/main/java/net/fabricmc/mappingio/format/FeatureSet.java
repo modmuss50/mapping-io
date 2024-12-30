@@ -21,7 +21,7 @@ public interface FeatureSet {
 	MetadataSupport fileMetadata();
 	MetadataSupport elementMetadata();
 	NameSupport packages();
-	NameSupport classes();
+	ClassSupport classes();
 	MemberSupport fields();
 	MemberSupport methods();
 	LocalSupport args();
@@ -80,6 +80,10 @@ public interface FeatureSet {
 	interface DescSupport {
 		FeaturePresence srcDescs();
 		FeaturePresence dstDescs();
+	}
+
+	interface ClassSupport extends NameSupport {
+		boolean hasRepackaging();
 	}
 
 	interface MemberSupport extends NameSupport, DescSupport {

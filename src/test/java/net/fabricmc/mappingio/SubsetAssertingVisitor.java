@@ -97,11 +97,39 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 		ClassMappingView supCls = supTree.getClass(srcName);
 		boolean supHasDstNames = supFeatures.classes().dstNames() != FeaturePresence.ABSENT;
 		boolean subHasDstNames = subFeatures.classes().dstNames() != FeaturePresence.ABSENT;
+		boolean supHasRepackaging = supFeatures.classes().hasRepackaging();
+		boolean subHasRepackaging = subFeatures.classes().hasRepackaging();
 
 		if (supCls == null) { // supTree doesn't have this class, ensure the incoming mappings don't have any data for it
 			if (supHasDstNames && subHasDstNames) {
 				String[] subDstNames = supFeatures.hasNamespaces() || dstNames == null ? dstNames : new String[]{dstNames[subNsIfSupNotNamespaced]};
-				assertTrue(isEmpty(subDstNames), "Incoming class not contained in supTree: " + srcName);
+
+				if (!isEmpty(subDstNames)) {
+					boolean error = true;
+
+					if (!supHasRepackaging) {
+						for (int subNs = 0; subNs < subDstNames.length; subNs++) {
+							String subDstName = subDstNames[subNs];
+
+							if (subDstName != null) {
+								String srcPkg = srcName.contains("/") ? srcName.substring(0, srcName.lastIndexOf('/')) : null;
+								String dstPkg = subDstName.contains("/") ? subDstName.substring(0, subDstName.lastIndexOf('/')) : null;
+
+								if (srcPkg != null && srcPkg.equals(dstPkg)) {
+									error = true;
+									break;
+								} else {
+									// The incoming class has been repackaged, which supFormat doesn't support, that's why it's missing from supTree
+									error = false;
+								}
+							}
+						}
+					}
+
+					if (error) {
+						throw new AssertionError("Incoming class not contained in supTree: " + srcName);
+					}
+				}
 			}
 
 			return true;
@@ -121,7 +149,25 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 				String subDstName = dstNames[subNs];
 				if (subDstName == null && (supDstName == null || Objects.equals(supDstName, srcName))) continue; // uncompleted dst name
 
-				assertEquals(supDstName != null ? supDstName : srcName, subDstName, "Incoming class destination name differs from supTree");
+				if (supDstName == null) {
+					supDstName = srcName;
+				}
+
+				boolean error = Objects.equals(supDstName, subDstName);
+
+				if (error && subDstName == null && !subHasRepackaging && supHasRepackaging) {
+					String srcPkg = srcName.contains("/") ? srcName.substring(0, srcName.lastIndexOf('/')) : null;
+					String dstPkg = supDstName.contains("/") ? supDstName.substring(0, supDstName.lastIndexOf('/')) : null;
+
+					if (srcPkg != null && srcPkg.equals(dstPkg)) {
+						// The incoming class has been repackaged in supTree, which subFormat doesn't support
+						error = false;
+					}
+				}
+
+				if (error) {
+					assertEquals(supDstName, subDstName, "Incoming class destination name differs from supTree");
+				}
 			}
 		}
 

@@ -27,58 +27,98 @@ import org.objectweb.asm.Type;
 
 import net.fabricmc.mappingio.TestHelper;
 import net.fabricmc.mappingio.tree.MappingTree;
+import net.fabricmc.mappingio.tree.MappingTree.ClassMapping;
+import net.fabricmc.mappingio.tree.MappingTree.FieldMapping;
+import net.fabricmc.mappingio.tree.MappingTree.MethodMapping;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public class MappingTreeRemapperTest {
+	private static final String cls1SrcName = "class_1";
+	private static final String cls3SrcName = "class_3";
+	private static final String fld1SrcName = "field_1";
+	private static final String mth1SrcName = "method_1";
+	private static String srcNs;
+	private static String dstNs;
+	private static String cls1DstName;
+	private static String cls3DstName;
+	private static String fld1SrcDesc;
+	private static String fld1DstName;
+	private static String mth1SrcDesc;
+	private static String mth1DstName;
 	private static MappingTree mappingTree;
 	private static MappingTreeRemapper remapper;
 
 	@BeforeAll
 	public static void setup() throws IOException {
 		mappingTree = TestHelper.acceptTestMappings(new MemoryMappingTree());
-		remapper = new MappingTreeRemapper(mappingTree, "source", "target");
+		srcNs = mappingTree.getSrcNamespace();
+		dstNs = mappingTree.getDstNamespaces().get(0);
+
+		remapper = new MappingTreeRemapper(mappingTree, srcNs, dstNs);
+
+		ClassMapping cls1 = mappingTree.getClass(cls1SrcName);
+		ClassMapping cls3 = mappingTree.getClass(cls3SrcName);
+		cls1DstName = cls1.getDstName(0);
+		cls3DstName = cls3.getDstName(0);
+
+		FieldMapping fld1 = cls1.getField(fld1SrcName, null);
+		fld1SrcDesc = fld1.getSrcDesc();
+		fld1DstName = fld1.getDstName(0);
+
+		MethodMapping mth1 = cls1.getMethod(mth1SrcName, null);
+		mth1SrcDesc = mth1.getSrcDesc();
+		mth1DstName = mth1.getDstName(0);
 	}
 
 	@Test
 	public void testInvalidNamespaces() {
-		assertThrows(IllegalArgumentException.class, () -> new MappingTreeRemapper(mappingTree, "unknown", "target"),
+		assertThrows(IllegalArgumentException.class, () -> new MappingTreeRemapper(mappingTree, "unknown", dstNs),
 				"must throw on missing source namespace");
-		assertThrows(IllegalArgumentException.class, () -> new MappingTreeRemapper(mappingTree, "source", "unknown"),
+		assertThrows(IllegalArgumentException.class, () -> new MappingTreeRemapper(mappingTree, srcNs, "unknown"),
 				"must throw on missing target namespace");
 	}
 
 	@Test
 	public void testMapClass() {
-		assertEquals("class1Ns0Rename", remapper.map("class_1"));
+		assertEquals(cls1DstName, remapper.map(cls1SrcName));
 	}
 
 	@Test
 	public void testMapMethod() {
-		assertEquals("method1Ns0Rename", remapper.mapMethodName("class_1", "method_1", "()I"));
+		assertEquals(mth1DstName, remapper.mapMethodName(cls1SrcName, mth1SrcName, mth1SrcDesc));
 	}
 
 	@Test
 	public void testMapField() {
-		assertEquals("field1Ns0Rename", remapper.mapFieldName("class_1", "field_1", "I"));
+		assertEquals(fld1DstName, remapper.mapFieldName(cls1SrcName, fld1SrcName, fld1SrcDesc));
 	}
 
 	@Test
 	public void testMapRecordComponent() {
 		// Record components are remapped as fields.
-		assertEquals("field1Ns0Rename", remapper.mapRecordComponentName("class_1", "field_1", "I"));
+		assertEquals(fld1DstName, remapper.mapRecordComponentName(cls1SrcName, fld1SrcName, fld1SrcDesc));
 	}
 
 	@Test
 	public void testMapDesc() {
-		assertEquals("Lclass3Ns0Rename;", remapper.mapDesc("Lclass_3;"));
-		assertEquals("()Lclass1Ns0Rename;", remapper.mapMethodDesc("()Lclass_1;"));
+		assertEquals(clsDesc(cls1DstName), remapper.mapDesc(clsDesc(cls1SrcName)));
+		assertEquals(mthDesc(cls3DstName), remapper.mapMethodDesc(mthDesc(cls3SrcName)));
 	}
 
 	@Test
 	public void testMapType() {
-		Type fieldType = Type.getType("Lclass_3;");
-		Type methodType = Type.getMethodType("()Lclass_1;");
-		assertEquals(Type.getType("Lclass3Ns0Rename;"), remapper.mapValue(fieldType));
-		assertEquals(Type.getMethodType("()Lclass1Ns0Rename;"), remapper.mapValue(methodType));
+		Type fieldType = Type.getType(clsDesc(cls3SrcName));
+		Type methodType = Type.getMethodType(mthDesc(cls1SrcName));
+
+		assertEquals(Type.getType(clsDesc(cls3DstName)), remapper.mapValue(fieldType));
+		assertEquals(Type.getMethodType(mthDesc(cls1DstName)), remapper.mapValue(methodType));
+	}
+
+	private String clsDesc(String name) {
+		return "L" + name + ";";
+	}
+
+	private String mthDesc(String name) {
+		return "()L" + name + ";";
 	}
 }

@@ -73,7 +73,7 @@ public class JobfFileReader {
 				do {
 					boolean isField;
 
-					if (reader.nextCol("c")) { // class: c <name-a> = <name-b>
+					if (reader.nextCol("c")) { // class: c <pkg>.<cls-name-a> = <cls-name-b>
 						String srcName = reader.nextCol();
 						if (srcName == null || srcName.isEmpty()) throw new IOException("missing class-name-a in line "+reader.getLineNumber());
 						srcName = srcName.replace('.', '/');
@@ -86,6 +86,9 @@ public class JobfFileReader {
 
 							String dstName = reader.nextCol();
 							if (dstName == null || dstName.isEmpty()) throw new IOException("missing class-name-b in line "+reader.getLineNumber());
+
+							String pkg = srcName.substring(0, srcName.lastIndexOf('/') + 1);
+							dstName = pkg + dstName;
 
 							visitor.visitDstName(MappedElementKind.CLASS, 0, dstName);
 							visitLastClass = visitor.visitElementContent(MappedElementKind.CLASS);

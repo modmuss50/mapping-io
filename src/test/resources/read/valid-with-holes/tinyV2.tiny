@@ -1,32 +1,35 @@
 tiny	2	0	source	target	target2
 c	class_1		
-c	class_2	class2Ns0Rename	
-c	class_3		class3Ns1Rename
-c	class_4		
+c	package_2/class_2		
+c	class_3	package_3/class3Ns0Rename	
+c	package_4/class_4		class4Ns1Rename
+c	class_5		
 	c	This is a comment
-c	class_5	class5Ns0Rename	
+c	package_6/class_6	package_7/class6Ns0Rename	
 	c	This is a comment
-c	class_6		class6Ns1Rename
+c	class_7		class7Ns1Rename
 	c	This is a comment
-c	class_7		
-c	class_7$class_8	class_7$class8Ns0Rename	
-c	class_9$class_10		class_9$class10Ns1Rename
-c	class_11$class_12		
+c	package_8/class_8		
+c	class_9		
+c	class_9$class_10	class_9$class10Ns0Rename	
+c	class_11$class_12		class_11$class12Ns1Rename
+c	class_13$class_14		
 	c	This is a comment
-c	class_13$class_14	class_13$class14Ns0Rename	
+c	class_15$class_16	class_15$class16Ns0Rename	
 	c	This is a comment
-c	class_15$class_16		class_15$class16Ns1Rename
+c	class_17$class_18		class_17$class18Ns1Rename
 	c	This is a comment
-c	class_17		
-c	class_17$class_18$class_19	class_17$class_18$class19Ns0Rename	
-c	class_20$class_21$class_22		class_20$class_21$class22Ns1Rename
-c	class_23$class_24$class_25		
+c	class_19		
+c	package_20/class_20		
+c	package_20/class_20$class_21$class_22	package_20/class_20$class_21$class22Ns0Rename	
+c	class_23$class_24$class_25		class_23$class_24$class25Ns1Rename
+c	package_26/class_26$class_27$class_28		
 	c	This is a comment
-c	class_26$class_27$class_28	class_26$class_27$class28Ns0Rename	
+c	class_29$class_30$class_31	class_29$class_30$class31Ns0Rename	
 	c	This is a comment
-c	class_29$class_30$class_31		class_29$class_30$class31Ns1Rename
+c	package_32/class_32$class_33$class_34		package_32/class_32$class_33$class34Ns1Rename
 	c	This is a comment
-c	class_32		
+c	class_35		
 	f	I	field_1		
 	f	Lcls;	field_2	field2Ns0Rename	
 	f	Lpkg/cls;	field_3		field3Ns1Rename
