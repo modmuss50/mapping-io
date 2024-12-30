@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.SubsetAssertingVisitor;
-import net.fabricmc.mappingio.TestHelper;
+import net.fabricmc.mappingio.TestUtil;
 import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch;
@@ -145,9 +145,9 @@ public class ValidContentReadTest {
 	}
 
 	private void checkDefault(MappingFormat format) throws Exception {
-		Path path = TestHelper.MappingDirs.VALID.resolve(TestHelper.getFileName(format));
+		Path path = TestUtil.MappingDirs.VALID.resolve(TestUtil.getFileName(format));
 
-		VisitableMappingTree referenceTree = TestHelper.acceptTestMappings(new MemoryMappingTree());
+		VisitableMappingTree referenceTree = TestUtil.acceptTestMappings(new MemoryMappingTree());
 		VisitableMappingTree tree = new MemoryMappingTree();
 		boolean allowConsecutiveDuplicateElementVisits = false;
 
@@ -167,9 +167,9 @@ public class ValidContentReadTest {
 	}
 
 	private void checkRepeated(MappingFormat format, boolean allowConsecutiveDuplicateElementVisits) throws Exception {
-		Path path = TestHelper.MappingDirs.REPEATED_ELEMENTS.resolve(TestHelper.getFileName(format));
+		Path path = TestUtil.MappingDirs.REPEATED_ELEMENTS.resolve(TestUtil.getFileName(format));
 
-		VisitableMappingTree referenceTree = TestHelper.acceptTestMappingsWithRepeats(new MemoryMappingTree(), true, true);
+		VisitableMappingTree referenceTree = TestUtil.acceptTestMappingsWithRepeats(new MemoryMappingTree(), true, true);
 		VisitableMappingTree tree = new MemoryMappingTree();
 
 		MappingReader.read(path, format, new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits));
@@ -188,9 +188,9 @@ public class ValidContentReadTest {
 	}
 
 	private void checkHoles(MappingFormat format) throws Exception {
-		Path path = TestHelper.MappingDirs.VALID_WITH_HOLES.resolve(TestHelper.getFileName(format));
+		Path path = TestUtil.MappingDirs.VALID_WITH_HOLES.resolve(TestUtil.getFileName(format));
 
-		VisitableMappingTree referenceTree = TestHelper.acceptTestMappingsWithHoles(new MemoryMappingTree());
+		VisitableMappingTree referenceTree = TestUtil.acceptTestMappingsWithHoles(new MemoryMappingTree());
 		VisitableMappingTree tree = new MemoryMappingTree();
 		boolean allowConsecutiveDuplicateElementVisits = false;
 

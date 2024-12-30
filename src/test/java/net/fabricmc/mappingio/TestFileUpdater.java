@@ -28,15 +28,15 @@ public class TestFileUpdater {
 				continue;
 			}
 
-			Path defaultPath = TestHelper.MappingDirs.VALID.resolve(TestHelper.getFileName(format));
-			Path holesPath = TestHelper.MappingDirs.VALID_WITH_HOLES.resolve(TestHelper.getFileName(format));
-			Path repeatPath = TestHelper.MappingDirs.REPEATED_ELEMENTS.resolve(TestHelper.getFileName(format));
+			Path defaultPath = TestUtil.MappingDirs.VALID.resolve(TestUtil.getFileName(format));
+			Path holesPath = TestUtil.MappingDirs.VALID_WITH_HOLES.resolve(TestUtil.getFileName(format));
+			Path repeatPath = TestUtil.MappingDirs.REPEATED_ELEMENTS.resolve(TestUtil.getFileName(format));
 
-			TestHelper.acceptTestMappings(MappingWriter.create(defaultPath, format));
-			TestHelper.acceptTestMappingsWithHoles(MappingWriter.create(holesPath, format));
+			TestUtil.acceptTestMappings(MappingWriter.create(defaultPath, format));
+			TestUtil.acceptTestMappingsWithHoles(MappingWriter.create(holesPath, format));
 
 			if (format != MappingFormat.ENIGMA_DIR) {
-				TestHelper.acceptTestMappingsWithRepeats(
+				TestUtil.acceptTestMappingsWithRepeats(
 						MappingWriter.create(repeatPath, format),
 						format != MappingFormat.ENIGMA_FILE,
 						format != MappingFormat.ENIGMA_FILE);

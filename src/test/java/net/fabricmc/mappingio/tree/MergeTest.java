@@ -32,7 +32,7 @@ import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.SubsetAssertingVisitor;
-import net.fabricmc.mappingio.TestHelper;
+import net.fabricmc.mappingio.TestUtil;
 import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.tree.MappingTree.ClassMapping;
@@ -41,7 +41,7 @@ import net.fabricmc.mappingio.tree.MemoryMappingTree.ClassEntry;
 import net.fabricmc.mappingio.tree.MemoryMappingTree.FieldEntry;
 
 public class MergeTest {
-	private static final Path dir = TestHelper.MappingDirs.MERGING;
+	private static final Path dir = TestUtil.MappingDirs.MERGING;
 	private static final String ns1 = "ns1";
 	private static final String ns2 = "ns2";
 	private static final String ns3 = "ns3";

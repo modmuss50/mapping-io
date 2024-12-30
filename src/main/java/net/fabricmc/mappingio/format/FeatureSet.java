@@ -40,19 +40,19 @@ public interface FeatureSet {
 	}
 
 	default boolean supportsFields() {
-		return FeatureSetHelper.isSupported(fields());
+		return FeatureSetUtil.isSupported(fields());
 	}
 
 	default boolean supportsMethods() {
-		return FeatureSetHelper.isSupported(methods());
+		return FeatureSetUtil.isSupported(methods());
 	}
 
 	default boolean supportsArgs() {
-		return FeatureSetHelper.isSupported(args());
+		return FeatureSetUtil.isSupported(args());
 	}
 
 	default boolean supportsVars() {
-		return FeatureSetHelper.isSupported(vars());
+		return FeatureSetUtil.isSupported(vars());
 	}
 
 	enum MetadataSupport {

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import net.fabricmc.mappingio.TestHelper;
+import net.fabricmc.mappingio.TestUtil;
 
 public class SetNamespacesTest {
 	private MemoryMappingTree tree;
@@ -36,7 +36,7 @@ public class SetNamespacesTest {
 	@BeforeEach
 	public void setup() throws IOException {
 		tree = new MemoryMappingTree();
-		TestHelper.acceptTestMappings(tree);
+		TestUtil.acceptTestMappings(tree);
 
 		srcNs = tree.getSrcNamespace();
 		dstNs0 = tree.getDstNamespaces().get(0);

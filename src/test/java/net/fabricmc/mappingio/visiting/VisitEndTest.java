@@ -33,7 +33,7 @@ import net.fabricmc.mappingio.MappingFlag;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.SubsetAssertingVisitor;
-import net.fabricmc.mappingio.TestHelper;
+import net.fabricmc.mappingio.TestUtil;
 import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.format.MappingFormat;
@@ -127,17 +127,17 @@ public class VisitEndTest {
 	}
 
 	private void check(MappingFormat format) throws Exception {
-		checkDir(TestHelper.MappingDirs.DETECTION, format);
-		checkDir(TestHelper.MappingDirs.VALID, format);
-		checkDir(TestHelper.MappingDirs.REPEATED_ELEMENTS, format);
-		checkDir(TestHelper.MappingDirs.VALID_WITH_HOLES, format);
+		checkDir(TestUtil.MappingDirs.DETECTION, format);
+		checkDir(TestUtil.MappingDirs.VALID, format);
+		checkDir(TestUtil.MappingDirs.REPEATED_ELEMENTS, format);
+		checkDir(TestUtil.MappingDirs.VALID_WITH_HOLES, format);
 	}
 
 	private void checkDir(Path dir, MappingFormat format) throws Exception {
-		Path path = dir.resolve(TestHelper.getFileName(format));
+		Path path = dir.resolve(TestUtil.getFileName(format));
 		if (!Files.exists(path)) return;
 
-		MappingTreeView supTree = TestHelper.MappingDirs.getCorrespondingTree(dir);
+		MappingTreeView supTree = TestUtil.MappingDirs.getCorrespondingTree(dir);
 
 		checkCompliance(format, path, 1, true, supTree);
 		checkCompliance(format, path, 1, false, supTree);

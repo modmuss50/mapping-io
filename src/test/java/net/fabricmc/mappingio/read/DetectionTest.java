@@ -30,11 +30,11 @@ import org.opentest4j.AssertionFailedError;
 
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.NopMappingVisitor;
-import net.fabricmc.mappingio.TestHelper;
+import net.fabricmc.mappingio.TestUtil;
 import net.fabricmc.mappingio.format.MappingFormat;
 
 public class DetectionTest {
-	private static final Path dir = TestHelper.MappingDirs.DETECTION;
+	private static final Path dir = TestUtil.MappingDirs.DETECTION;
 
 	@Test
 	public void enigmaFile() throws Exception {
@@ -121,7 +121,7 @@ public class DetectionTest {
 	}
 
 	private void check(MappingFormat format) throws Exception {
-		Path path = dir.resolve(TestHelper.getFileName(format));
+		Path path = dir.resolve(TestUtil.getFileName(format));
 		assertEquals(format, MappingReader.detectFormat(path));
 
 		if (!format.hasSingleFile()) return;

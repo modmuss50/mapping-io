@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.MappingFlag;
 import net.fabricmc.mappingio.NopMappingVisitor;
-import net.fabricmc.mappingio.TestHelper;
+import net.fabricmc.mappingio.TestUtil;
 
 public class MetadataTest {
 	private static final Random random = new Random();
@@ -42,7 +42,7 @@ public class MetadataTest {
 
 	@BeforeAll
 	public static void setup() throws Exception {
-		tree = TestHelper.acceptTestMappings(new MemoryMappingTree());
+		tree = TestUtil.acceptTestMappings(new MemoryMappingTree());
 		tree.getMetadata().clear();
 
 		for (int i = 0; i < 40; i++) {

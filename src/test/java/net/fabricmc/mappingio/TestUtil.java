@@ -35,10 +35,10 @@ import net.fabricmc.mappingio.lib.jool.Unchecked;
 import net.fabricmc.mappingio.tree.MappingTreeView;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
-public final class TestHelper {
+public final class TestUtil {
 	public static Path getResource(String slashPrefixedResourcePath) {
 		try {
-			return Paths.get(TestHelper.class.getResource(slashPrefixedResourcePath).toURI());
+			return Paths.get(TestUtil.class.getResource(slashPrefixedResourcePath).toURI());
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
