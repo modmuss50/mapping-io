@@ -40,9 +40,12 @@ import net.fabricmc.mappingio.MappingVisitor;
  * <p>For example, it takes a class {@code class_1$class_2} that doesn't have a mapping,
  * tries to find {@code class_1}, which let's say has the mapping {@code SomeClass},
  * and changes the former's destination name to {@code SomeClass$class_2}.
+ *
+ * @implNote This visitor requires two pre-passes: one to collect all classes and their mappings,
+ * the other to actually apply the outer names. The third pass onwards will then emit the final mappings.
  */
-public class OuterClassNameInheritingVisitor extends ForwardingMappingVisitor {
-	protected OuterClassNameInheritingVisitor(MappingVisitor next) {
+public class OuterClassNamePropagator extends ForwardingMappingVisitor {
+	public OuterClassNamePropagator(MappingVisitor next) {
 		super(next);
 	}
 

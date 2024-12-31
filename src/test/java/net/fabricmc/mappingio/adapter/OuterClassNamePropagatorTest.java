@@ -33,7 +33,7 @@ import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import net.fabricmc.mappingio.tree.VisitableMappingTree;
 
-public class OuterClassNameInheritingVisitorTest {
+public class OuterClassNamePropagatorTest {
 	private static void accept(MappingVisitor visitor) throws IOException {
 		visitor = new VisitOrderVerifyingVisitor(visitor);
 
@@ -97,13 +97,13 @@ public class OuterClassNameInheritingVisitorTest {
 
 	@Test
 	public void directVisit() throws IOException {
-		accept(new OuterClassNameInheritingVisitor(new CheckingVisitor(false)));
+		accept(new OuterClassNamePropagator(new CheckingVisitor(false)));
 	}
 
 	@Test
 	public void tree() throws IOException {
 		VisitableMappingTree tree = new MemoryMappingTree();
-		accept(new OuterClassNameInheritingVisitor(tree));
+		accept(new OuterClassNamePropagator(tree));
 		tree.accept(new CheckingVisitor(true));
 	}
 
