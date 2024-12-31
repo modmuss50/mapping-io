@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7.0] - 2025-01-01
 - Added IntelliJ IDEA migration map reader and writer
 - Added `MappingFormat#features()` to allow for more fine-grained programmatic querying of format capabilities
 - Added tests to validate our writer outputs against 3rd-party readers
@@ -12,10 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Made handling of the `NEEDS_MULTIPLE_PASSES` flag more consistent, reducing memory usage in a few cases
 - Made some internal methods in Enigma and TSRG readers actually private
 - Renamed `OuterClassNameInheritingVisitor` to `OuterClassNamePropagator` and made its constructor public
-- Made all writers for formats which can't represent empty destination names skip such elements entirely, unless mapped child elements are present
-- Added missing `visitElementContent` calls to CSRG and Recaf Simple readers
-- Added protection to `MemoryMappingTree` guarding against external data modification while a visitation pass is in progress
-- Clearly defined Tree-API contracts regarding returned collections' mutability
+- Made all writers for formats which can't represent empty destination names skip such elements entirely, unless the format is hierarchical and mapped child elements are present
+- Adjusted some readers to make sure that elements aren't visited multiple times with the same data
+- Added missing visit calls to multiple readers
+- Added safeguards to `MemoryMappingTree` preventing external data modification during an ongoing visitation pass
+- Clearly defined tree-API contracts regarding returned collections' mutability
 - Fixed `MemoryMappingTree#reset` to actually reset all its internal state related to the current visitation pass
 - Fixed and improved `MemoryMappingTree`'s merging capabilities:
   - Fixed broken member mapping merging via tree-API in `MemoryMappingTree`
