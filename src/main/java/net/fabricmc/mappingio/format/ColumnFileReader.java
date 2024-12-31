@@ -188,7 +188,7 @@ public final class ColumnFileReader implements Closeable {
 				bufferPos = modifiedBufferPos;
 
 				// consume trailing column separator if present
-				if (isColumnSeparator && filled && fillBuffer(1, false, false)) {
+				if (isColumnSeparator && fillBuffer(1, false, false)) {
 					bufferPos++;
 				}
 			}
@@ -244,7 +244,7 @@ public final class ColumnFileReader implements Closeable {
 	}
 
 	/**
-	 * Read and consume until the the start of the next line is reached, and return whether the
+	 * Read and consume until the start of the next line is reached, and return whether the
 	 * following {@code indent} characters match {@link #indentationChar}.
 	 *
 	 * <p>Empty lines are skipped if {@code indent} is 0.
@@ -302,7 +302,7 @@ public final class ColumnFileReader implements Closeable {
 	}
 
 	/**
-	 * Whether or not EOL has been encountered in the current line yet.
+	 * Whether EOL has been encountered in the current line yet.
 	 */
 	public boolean isAtEol() {
 		return eol;

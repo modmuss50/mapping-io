@@ -108,12 +108,10 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 					boolean error = true;
 
 					if (!supHasRepackaging) {
-						for (int subNs = 0; subNs < subDstNames.length; subNs++) {
-							String subDstName = subDstNames[subNs];
-
+						for (String subDstName : subDstNames) {
 							if (subDstName != null) {
-								String srcPkg = srcName.contains("/") ? srcName.substring(0, srcName.lastIndexOf('/')) : null;
-								String dstPkg = subDstName.contains("/") ? subDstName.substring(0, subDstName.lastIndexOf('/')) : null;
+								String srcPkg = getPackage(srcName);
+								String dstPkg = getPackage(subDstName);
 
 								if (srcPkg != null && srcPkg.equals(dstPkg)) {
 									error = true;
@@ -153,11 +151,11 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 					supDstName = srcName;
 				}
 
-				boolean error = Objects.equals(supDstName, subDstName);
+				boolean error = !Objects.equals(supDstName, subDstName);
 
 				if (error && subDstName == null && !subHasRepackaging && supHasRepackaging) {
-					String srcPkg = srcName.contains("/") ? srcName.substring(0, srcName.lastIndexOf('/')) : null;
-					String dstPkg = supDstName.contains("/") ? supDstName.substring(0, supDstName.lastIndexOf('/')) : null;
+					String srcPkg = getPackage(srcName);
+					String dstPkg = getPackage(supDstName);
 
 					if (srcPkg != null && srcPkg.equals(dstPkg)) {
 						// The incoming class has been repackaged in supTree, which subFormat doesn't support
@@ -428,7 +426,7 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 		String subVarId = srcClsName + "#" + srcMethodName + srcMethodDesc + ":" + lvtRowIndex + ":" + lvIndex + ":" + startOpIdx + ":" + endOpIdx + ":" + srcName;
 		ClassMappingView supCls = Objects.requireNonNull(supTree.getClass(srcClsName), "Incoming var's parent class not contained in supTree: " + subVarId);
 		MethodMappingView supMth = Objects.requireNonNull(supCls.getMethod(srcMethodName, srcMethodDesc), "Incoming var's parent method not contained in supTree: " + subVarId);
-		MethodVarMappingView supVar = Objects.requireNonNull(supMth.getVar(lvtRowIndex, lvIndex, startOpIdx, endOpIdx, srcName), "Incoming var not contained in supTree: " + subVarId);
+		MethodVarMappingView supVar = supMth.getVar(lvtRowIndex, lvIndex, startOpIdx, endOpIdx, srcName);
 
 		boolean supHasLvIndices = supFeatures.vars().lvIndices() != FeaturePresence.ABSENT;
 		boolean subHasLvIndices = subFeatures.vars().lvIndices() != FeaturePresence.ABSENT;
@@ -516,6 +514,12 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 		}
 
 		return true;
+	}
+
+	@Nullable
+	private String getPackage(String name) {
+		int lastSlash = name.lastIndexOf('/');
+		return lastSlash == -1 ? null : name.substring(0, lastSlash);
 	}
 
 	private final MappingTreeView supTree;

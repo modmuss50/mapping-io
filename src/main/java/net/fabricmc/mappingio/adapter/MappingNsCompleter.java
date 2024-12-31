@@ -45,7 +45,7 @@ public final class MappingNsCompleter extends ForwardingMappingVisitor {
 	/**
 	 * @param next The next visitor to forward the data to.
 	 * @param alternatives A map of which namespaces should copy from which others.
-	 * @param addMissingNs Whether or not to copy namespaces from the alternatives keyset if not already present.
+	 * @param addMissingNs Whether to copy namespaces from the alternatives key set if not already present.
 	 */
 	public MappingNsCompleter(MappingVisitor next, Map<String, String> alternatives, boolean addMissingNs) {
 		super(next);

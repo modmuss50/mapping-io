@@ -188,7 +188,7 @@ public final class TestUtil {
 	// Make sure to keep the few manual changes in the files.
 	public static <T extends MappingVisitor> T acceptTestMappingsWithRepeats(T target, boolean repeatComments, boolean repeatClasses) throws IOException {
 		acceptTestMappings(new ForwardingMappingVisitor(new VisitOrderVerifyingVisitor(target, true)) {
-			private List<Runnable> replayQueue = new ArrayList<>();
+			private final List<Runnable> replayQueue = new ArrayList<>();
 
 			@Override
 			public void visitMetadata(String key, @Nullable String value) throws IOException {

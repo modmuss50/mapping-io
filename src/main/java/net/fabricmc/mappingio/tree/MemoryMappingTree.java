@@ -74,7 +74,7 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 	}
 
 	/**
-	 * Whether or not to index classes by their destination names, in addition to their source names.
+	 * Whether to index classes by their destination names, in addition to their source names.
 	 *
 	 * <p>Trades higher memory consumption for faster lookups by destination name.
 	 */
@@ -96,7 +96,7 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 		classesByDstNames = new Map[dstNamespaces.size()];
 
 		for (int i = 0; i < classesByDstNames.length; i++) {
-			classesByDstNames[i] = new HashMap<String, ClassEntry>(classesBySrcName.size());
+			classesByDstNames[i] = new HashMap<>(classesBySrcName.size());
 		}
 
 		for (ClassEntry cls : classesBySrcName.values()) {
@@ -451,7 +451,7 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 					classesByDstNames = Arrays.copyOf(classesByDstNames, newSize);
 
 					for (int i = newSize - newDstNamespaces; i < classesByDstNames.length; i++) {
-						classesByDstNames[i] = new HashMap<String, ClassEntry>(classesBySrcName.size());
+						classesByDstNames[i] = new HashMap<>(classesBySrcName.size());
 					}
 				}
 			}
@@ -793,10 +793,8 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 
 				break;
 			case METHOD_ARG:
-				((MethodArgEntry) currentEntry).setSrcName(name);
-				return;
 			case METHOD_VAR:
-				((MethodVarEntry) currentEntry).setSrcName(name);
+				currentEntry.setSrcName(name);
 				return;
 			}
 
@@ -2025,6 +2023,7 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 		}
 
 		@Override
+		@Nullable
 		public String getValue() {
 			return value;
 		}
@@ -2039,12 +2038,18 @@ public final class MemoryMappingTree implements VisitableMappingTree {
 
 			MetadataEntryImpl entry = (MetadataEntryImpl) other;
 
-			return this.key.equals(entry.key) && this.value.equals(entry.value);
+			return this.key.equals(entry.key) && Objects.equals(this.value, entry.value);
 		}
 
 		@Override
 		public int hashCode() {
-			return key.hashCode() | value.hashCode();
+			int ret = key.hashCode();
+
+			if (value != null) {
+				ret |= value.hashCode();
+			}
+
+			return ret;
 		}
 
 		@Override

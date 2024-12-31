@@ -103,7 +103,7 @@ public class MergeTest {
 	private FieldMapping fieldMappingOf(ClassMapping cls, String name, String desc) throws Exception {
 		return FieldEntry.class
 				.getDeclaredConstructor(ClassEntry.class, String.class, String.class)
-				.newInstance(cls, name, desc);
+				.newInstance((ClassEntry) cls, name, desc);
 	}
 
 	@Test
@@ -248,7 +248,7 @@ public class MergeTest {
 	 * cls2Ns1Name                      | cls2Ns2Name
 	 *  \-- fldNs1Name : Lcls1Ns1Name;  |  \-- fldNs2Name
 	 *
-	 * Correct thanks to MemoryMappingTree's advanced merging capabilities.
+	 * Correct, thanks to MemoryMappingTree's advanced merging capabilities.
 	 */
 	@Test
 	public void descriptorCompletion() throws IOException {

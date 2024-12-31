@@ -68,11 +68,10 @@ public final class EnigmaFileReader {
 
 			if (visitor.visitContent()) {
 				StringBuilder commentSb = new StringBuilder(200);
-				final MappingVisitor finalVisitor = visitor;
 
 				do {
 					if (reader.nextCol("CLASS")) { // class: CLASS <name-a> [<name-b>]
-						readClass(reader, 0, null, null, commentSb, finalVisitor);
+						readClass(reader, 0, null, null, commentSb, visitor);
 					}
 				} while (reader.nextLine(0));
 			}

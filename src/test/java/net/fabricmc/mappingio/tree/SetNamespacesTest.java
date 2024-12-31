@@ -16,8 +16,8 @@
 
 package net.fabricmc.mappingio.tree;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -99,10 +99,10 @@ public class SetNamespacesTest {
 	}
 
 	private void assertSrc(String srcNs) {
-		assertTrue(tree.getSrcNamespace().equals(srcNs));
+		assertEquals(tree.getSrcNamespace(), srcNs);
 	}
 
 	private void assertDst(String... dstNs) {
-		assertTrue(tree.getDstNamespaces().equals(Arrays.asList(dstNs)));
+		assertEquals(tree.getDstNamespaces(), Arrays.asList(dstNs));
 	}
 }

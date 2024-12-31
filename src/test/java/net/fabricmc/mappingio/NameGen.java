@@ -257,11 +257,11 @@ class NameGen {
 	private static final MappedElementKind mthKind = MappedElementKind.METHOD;
 	private static final MappedElementKind argKind = MappedElementKind.METHOD_ARG;
 	private static final MappedElementKind varKind = MappedElementKind.METHOD_VAR;
-	private AtomicInteger clsNum = new AtomicInteger();
-	private AtomicInteger fldNum = new AtomicInteger();
-	private AtomicInteger mthNum = new AtomicInteger();
-	private AtomicInteger argNum = new AtomicInteger();
-	private AtomicInteger varNum = new AtomicInteger();
+	private final AtomicInteger clsNum = new AtomicInteger();
+	private final AtomicInteger fldNum = new AtomicInteger();
+	private final AtomicInteger mthNum = new AtomicInteger();
+	private final AtomicInteger argNum = new AtomicInteger();
+	private final AtomicInteger varNum = new AtomicInteger();
 	private int nsNum;
 	private int counter;
 	private MappedElementKind lastKind;

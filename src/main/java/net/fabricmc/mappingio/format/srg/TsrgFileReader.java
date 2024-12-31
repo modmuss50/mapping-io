@@ -70,7 +70,7 @@ public final class TsrgFileReader {
 	}
 
 	private static void read(ColumnFileReader reader, String sourceNs, String targetNs, MappingVisitor visitor) throws IOException {
-		MappingFormat format = reader.nextCol("tsrg2") ? format = MappingFormat.TSRG_2_FILE : MappingFormat.TSRG_FILE;
+		MappingFormat format = reader.nextCol("tsrg2") ? MappingFormat.TSRG_2_FILE : MappingFormat.TSRG_FILE;
 		String srcNamespace;
 		List<String> dstNamespaces;
 		boolean readerMarked = false;

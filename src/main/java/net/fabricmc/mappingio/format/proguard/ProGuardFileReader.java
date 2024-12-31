@@ -193,7 +193,7 @@ public final class ProGuardFileReader {
 		int arrayStart = type.indexOf('[');
 
 		if (arrayStart != -1) {
-			assert type.substring(arrayStart).matches("(\\[\\])+");
+			assert type.substring(arrayStart).matches("(\\[])+");
 
 			int arrayDimensions = (type.length() - arrayStart) / 2; // 2 chars each: []
 

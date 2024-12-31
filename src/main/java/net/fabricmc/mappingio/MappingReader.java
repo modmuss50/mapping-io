@@ -150,8 +150,7 @@ public final class MappingReader {
 	}
 
 	private static boolean isEmptyOrStartsWithHash(String string) {
-		if (string.isEmpty() || string.startsWith("#")) return true;
-		return false;
+		return string.isEmpty() || string.startsWith("#");
 	}
 
 	public static List<String> getNamespaces(Path file) throws IOException {

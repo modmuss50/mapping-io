@@ -86,10 +86,10 @@ public final class RecafSimpleFileReader {
 
 					int dotPos = parts[0].lastIndexOf('.');
 					String clsSrcName;
-					String clsDstName = null;
+					String clsDstName;
 					String memberSrcName = null;
 					String memberSrcDesc = null;
-					String memberDstName = null;
+					String memberDstName;
 					boolean isMethod = false;
 
 					if (dotPos < 0) { // class

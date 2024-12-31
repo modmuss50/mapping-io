@@ -242,11 +242,12 @@ public final class VisitOrder {
 			int endA = a.indexOf('$', pos);
 			int endB = b.indexOf('$', pos);
 
+			int positiveEndA = endA < 0 ? a.length() : endA;
+			int positiveEndB = endB < 0 ? b.length() : endB;
+
 			int ret = shortFirst
-					? compareShortFirst(a, pos, endA >= 0 ? endA : a.length(),
-							b, pos, endB >= 0 ? endB : b.length())
-					: compare(a, pos, endA >= 0 ? endA : a.length(),
-							b, pos, endB >= 0 ? endB : b.length());
+					? compareShortFirst(a, pos, positiveEndA, b, pos, positiveEndB)
+					: compare(a, pos, positiveEndA, b, pos, positiveEndB);
 
 			if (ret != 0) {
 				return ret;

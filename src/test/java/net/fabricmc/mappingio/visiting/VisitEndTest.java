@@ -16,6 +16,7 @@
 
 package net.fabricmc.mappingio.visiting;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -154,13 +155,13 @@ public class VisitEndTest {
 		}
 
 		// Reader didn't throw an exception, make sure it actually behaved as expected
-		assertTrue(nonFlaggedVisitor.finishedVisitPassCount == nonFlaggedVisitor.visitPassCountToFinish);
+		assertEquals(nonFlaggedVisitor.finishedVisitPassCount, nonFlaggedVisitor.visitPassCountToFinish);
 	}
 
 	private VisitEndTestVisitor checkCompliance(MappingFormat format, Path path, int visitPassCountToFinish, boolean setFlag, MappingTreeView supTree) throws Exception {
 		VisitEndTestVisitor visitor = new VisitEndTestVisitor(visitPassCountToFinish, setFlag, supTree, format);
 		MappingReader.read(path, format, new VisitOrderVerifyingVisitor(visitor));
-		assertTrue(visitor.finishedVisitPassCount == visitPassCountToFinish);
+		assertEquals(visitor.finishedVisitPassCount, visitPassCountToFinish);
 		return visitor;
 	}
 

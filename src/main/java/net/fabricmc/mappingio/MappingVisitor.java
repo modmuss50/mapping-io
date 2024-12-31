@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Visitor with order implied context and consecutive dst name visits.
  *
- * <p>The visitation order is as follows (omitting visit prefixes for brevity, lowercase for cross references):
+ * <p>The visitation order is as follows (omitting visit prefixes for brevity, lowercase for cross-references):
  * <ul><li>overall: header -> content -> End -> overall
  * <li>header: Header -> Namespaces [-> Metadata]*
  * <li>content: Content [-> class|Metadata]*
@@ -90,7 +90,7 @@ public interface MappingVisitor {
 	 *
 	 * @param srcName The fully qualified source name of the class, in internal form
 	 * (slashes instead of dots, dollar signs for delimiting inner classes).
-	 * @return Whether or not the class's content should be visited too.
+	 * @return Whether the class's content should be visited too.
 	 */
 	boolean visitClass(String srcName) throws IOException;
 	boolean visitField(String srcName, @Nullable String srcDesc) throws IOException;
@@ -104,7 +104,7 @@ public interface MappingVisitor {
 	 * Starts at 0 for static methods, 1 otherwise. For each additional parameter,
 	 * it gets incremented by 1, or by 2 if it's a double-wide primitive ({@code long} or {@code double}).
 	 * @param srcName The optional source name of the parameter.
-	 * @return Whether or not the arg's content should be visited too.
+	 * @return Whether the arg's content should be visited too.
 	 */
 	boolean visitMethodArg(int argPosition, int lvIndex, @Nullable String srcName) throws IOException;
 
@@ -124,7 +124,7 @@ public interface MappingVisitor {
 	 * not re-define the existing var, but instead generate a new one (with both sharing the same lvIndex).
 	 * @param endOpIdx Counterpart to startOpIdx. Exclusive.
 	 * @param srcName The optional source name of the variable.
-	 * @return Whether or not the var's content should be visited too.
+	 * @return Whether the var's content should be visited too.
 	 */
 	boolean visitMethodVar(int lvtRowIndex, int lvIndex, int startOpIdx, int endOpIdx, @Nullable String srcName) throws IOException;
 

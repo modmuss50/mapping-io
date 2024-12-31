@@ -72,6 +72,8 @@ public class MetadataTest {
 	@Test
 	public void testUniqueness() throws Exception {
 		tree.accept(new NopMappingVisitor(true) {
+			private final Set<String> visitedKeys = new HashSet<>();
+
 			@Override
 			public Set<MappingFlag> getFlags() {
 				return EnumSet.of(MappingFlag.NEEDS_METADATA_UNIQUENESS);
@@ -82,8 +84,6 @@ public class MetadataTest {
 				assertFalse(visitedKeys.contains(key));
 				visitedKeys.add(key);
 			}
-
-			Set<String> visitedKeys = new HashSet<>();
 		});
 	}
 }

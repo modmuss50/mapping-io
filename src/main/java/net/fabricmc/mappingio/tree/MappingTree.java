@@ -78,7 +78,7 @@ public interface MappingTree extends MappingTreeView {
 	/**
 	 * Removes all metadata entries whose key is equal to the passed one.
 	 *
-	 * @return Whether or not any entries have been removed.
+	 * @return Whether any entries have been removed.
 	 */
 	boolean removeMetadata(String key);
 
