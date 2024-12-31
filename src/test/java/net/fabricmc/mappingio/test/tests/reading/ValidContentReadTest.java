@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.read;
+package net.fabricmc.mappingio.test.tests.reading;
 
 import java.nio.file.Path;
 
@@ -22,12 +22,12 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.MappingReader;
-import net.fabricmc.mappingio.SubsetAssertingVisitor;
-import net.fabricmc.mappingio.TestUtil;
-import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch;
 import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.visitors.SubsetAssertingVisitor;
+import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MappingTreeView;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import net.fabricmc.mappingio.tree.VisitableMappingTree;
@@ -188,7 +188,7 @@ public class ValidContentReadTest {
 	}
 
 	private void checkHoles(MappingFormat format) throws Exception {
-		Path path = TestUtil.MappingDirs.VALID_WITH_HOLES.resolve(TestUtil.getFileName(format));
+		Path path = TestUtil.MappingDirs.HOLES.resolve(TestUtil.getFileName(format));
 
 		VisitableMappingTree referenceTree = TestUtil.acceptTestMappingsWithHoles(new MemoryMappingTree());
 		VisitableMappingTree tree = new MemoryMappingTree();

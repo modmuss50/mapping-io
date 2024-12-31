@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.adapter;
+package net.fabricmc.mappingio.test.tests.adapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,8 +28,9 @@ import org.junit.jupiter.api.Test;
 import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingFlag;
 import net.fabricmc.mappingio.MappingVisitor;
-import net.fabricmc.mappingio.NopMappingVisitor;
-import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
+import net.fabricmc.mappingio.adapter.OuterClassNamePropagator;
+import net.fabricmc.mappingio.test.visitors.NopMappingVisitor;
+import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import net.fabricmc.mappingio.tree.VisitableMappingTree;
 

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio;
+package net.fabricmc.mappingio.test;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
+import net.fabricmc.mappingio.MappingWriter;
 import net.fabricmc.mappingio.format.MappingFormat;
 
 public class TestFileUpdater {
@@ -29,7 +30,7 @@ public class TestFileUpdater {
 			}
 
 			Path defaultPath = TestUtil.MappingDirs.VALID.resolve(TestUtil.getFileName(format));
-			Path holesPath = TestUtil.MappingDirs.VALID_WITH_HOLES.resolve(TestUtil.getFileName(format));
+			Path holesPath = TestUtil.MappingDirs.HOLES.resolve(TestUtil.getFileName(format));
 			Path repeatPath = TestUtil.MappingDirs.REPEATED_ELEMENTS.resolve(TestUtil.getFileName(format));
 
 			TestUtil.acceptTestMappings(MappingWriter.create(defaultPath, format));

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.tree;
+package net.fabricmc.mappingio.test.tests.tree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,8 +31,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.MappingFlag;
-import net.fabricmc.mappingio.NopMappingVisitor;
-import net.fabricmc.mappingio.TestUtil;
+import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.visitors.NopMappingVisitor;
+import net.fabricmc.mappingio.tree.MemoryMappingTree;
+import net.fabricmc.mappingio.tree.VisitableMappingTree;
 
 public class MetadataTest {
 	private static final Random random = new Random();

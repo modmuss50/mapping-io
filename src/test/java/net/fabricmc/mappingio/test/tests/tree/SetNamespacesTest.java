@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.tree;
+package net.fabricmc.mappingio.test.tests.tree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +25,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import net.fabricmc.mappingio.TestUtil;
+import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public class SetNamespacesTest {
 	private MemoryMappingTree tree;

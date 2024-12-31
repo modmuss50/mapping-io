@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio;
+package net.fabricmc.mappingio.test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -28,10 +28,15 @@ import net.neoforged.srgutils.IMappingFile;
 import org.cadixdev.lorenz.io.MappingFormats;
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.mappingio.MappedElementKind;
+import net.fabricmc.mappingio.MappingUtil;
+import net.fabricmc.mappingio.MappingVisitor;
+import net.fabricmc.mappingio.MappingWriter;
 import net.fabricmc.mappingio.adapter.ForwardingMappingVisitor;
 import net.fabricmc.mappingio.format.MappingFormat;
 import net.fabricmc.mappingio.format.intellij.MigrationMapConstants;
-import net.fabricmc.mappingio.lib.jool.Unchecked;
+import net.fabricmc.mappingio.test.lib.jool.Unchecked;
+import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MappingTreeView;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
@@ -394,14 +399,14 @@ public final class TestUtil {
 		public static MemoryMappingTree getCorrespondingTree(Path dir) throws IOException {
 			if (dir.equals(VALID)) return acceptTestMappings(new MemoryMappingTree());
 			if (dir.equals(REPEATED_ELEMENTS)) return acceptTestMappingsWithRepeats(new MemoryMappingTree(), true, true);
-			if (dir.equals(VALID_WITH_HOLES)) return acceptTestMappingsWithHoles(new MemoryMappingTree());
+			if (dir.equals(HOLES)) return acceptTestMappingsWithHoles(new MemoryMappingTree());
 			return null;
 		}
 
 		public static final Path DETECTION = getResource("/detection/");
-		public static final Path VALID = getResource("/read/valid/");
-		public static final Path REPEATED_ELEMENTS = getResource("/read/repeated-elements/");
-		public static final Path VALID_WITH_HOLES = getResource("/read/valid-with-holes/");
+		public static final Path VALID = getResource("/reading/valid/");
+		public static final Path REPEATED_ELEMENTS = getResource("/reading/repeated-elements/");
+		public static final Path HOLES = getResource("/reading/holes/");
 		public static final Path MERGING = getResource("/merging/");
 	}
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio;
+package net.fabricmc.mappingio.test.visitors;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,6 +24,8 @@ import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.mappingio.MappedElementKind;
+import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.adapter.ForwardingMappingVisitor;
 
 /**

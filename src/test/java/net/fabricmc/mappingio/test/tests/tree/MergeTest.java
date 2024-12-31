@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.tree;
+package net.fabricmc.mappingio.test.tests.tree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,14 +32,13 @@ import org.junit.jupiter.api.Test;
 import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.MappingVisitor;
-import net.fabricmc.mappingio.SubsetAssertingVisitor;
-import net.fabricmc.mappingio.TestUtil;
-import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
+import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.visitors.SubsetAssertingVisitor;
+import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MappingTree.ClassMapping;
 import net.fabricmc.mappingio.tree.MappingTree.FieldMapping;
-import net.fabricmc.mappingio.tree.MemoryMappingTree.ClassEntry;
-import net.fabricmc.mappingio.tree.MemoryMappingTree.FieldEntry;
+import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public class MergeTest {
 	private static final Path dir = TestUtil.MappingDirs.MERGING;
@@ -101,9 +101,18 @@ public class MergeTest {
 	}
 
 	private FieldMapping fieldMappingOf(ClassMapping cls, String name, String desc) throws Exception {
-		return FieldEntry.class
-				.getDeclaredConstructor(ClassEntry.class, String.class, String.class)
-				.newInstance((ClassEntry) cls, name, desc);
+		String fieldEntryClassName = "net.fabricmc.mappingio.tree.MemoryMappingTree$FieldEntry";
+		String classEntryClassName = "net.fabricmc.mappingio.tree.MemoryMappingTree$ClassEntry";
+
+		Class<?> fieldEntryClass = Class.forName(fieldEntryClassName);
+
+		Constructor<?> fieldEntryCtor = fieldEntryClass.getDeclaredConstructor(
+				Class.forName(classEntryClassName),
+				String.class,
+				String.class);
+		fieldEntryCtor.setAccessible(true);
+
+		return (FieldMapping) fieldEntryCtor.newInstance(cls, name, desc);
 	}
 
 	@Test

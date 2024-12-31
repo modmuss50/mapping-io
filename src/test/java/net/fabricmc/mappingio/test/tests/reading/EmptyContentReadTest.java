@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.read;
+package net.fabricmc.mappingio.test.tests.reading;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -25,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.MappingVisitor;
-import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.format.enigma.EnigmaFileReader;
 import net.fabricmc.mappingio.format.intellij.MigrationMapFileReader;
 import net.fabricmc.mappingio.format.jobf.JobfFileReader;
@@ -36,6 +35,7 @@ import net.fabricmc.mappingio.format.srg.SrgFileReader;
 import net.fabricmc.mappingio.format.srg.TsrgFileReader;
 import net.fabricmc.mappingio.format.tiny.Tiny1FileReader;
 import net.fabricmc.mappingio.format.tiny.Tiny2FileReader;
+import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public class EmptyContentReadTest {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio;
+package net.fabricmc.mappingio.test.visitors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,6 +27,8 @@ import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.mappingio.FlatMappingVisitor;
+import net.fabricmc.mappingio.MappingUtil;
 import net.fabricmc.mappingio.format.FeatureSet;
 import net.fabricmc.mappingio.format.FeatureSet.ElementCommentSupport;
 import net.fabricmc.mappingio.format.FeatureSet.FeaturePresence;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.read;
+package net.fabricmc.mappingio.test.tests.reading;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,9 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
 import net.fabricmc.mappingio.MappingReader;
-import net.fabricmc.mappingio.NopMappingVisitor;
-import net.fabricmc.mappingio.TestUtil;
 import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.visitors.NopMappingVisitor;
 
 public class DetectionTest {
 	private static final Path dir = TestUtil.MappingDirs.DETECTION;

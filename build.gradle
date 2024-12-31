@@ -35,7 +35,7 @@ allprojects {
 			indentWithTabs()
 			trimTrailingWhitespace()
 			targetExclude(
-					'src/test/java/net/fabricmc/mappingio/lib/**/*.java',
+					'src/test/java/net/fabricmc/mappingio/test/lib/**/*.java',
 					'src/main/java/net/fabricmc/mappingio/tree/AlphanumericComparator.java')
 		}
 	}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.lib.jool.fi.lang;
+package net.fabricmc.mappingio.test.lib.jool.fi.lang;
 
 /**
  * A {@link Runnable} that allows for checked exceptions.

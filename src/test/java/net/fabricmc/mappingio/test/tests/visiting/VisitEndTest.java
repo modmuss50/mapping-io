@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.visiting;
+package net.fabricmc.mappingio.test.tests.visiting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,11 +33,11 @@ import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingFlag;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.MappingVisitor;
-import net.fabricmc.mappingio.SubsetAssertingVisitor;
-import net.fabricmc.mappingio.TestUtil;
-import net.fabricmc.mappingio.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.visitors.SubsetAssertingVisitor;
+import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MappingTree;
 import net.fabricmc.mappingio.tree.MappingTreeView;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
@@ -131,7 +131,7 @@ public class VisitEndTest {
 		checkDir(TestUtil.MappingDirs.DETECTION, format);
 		checkDir(TestUtil.MappingDirs.VALID, format);
 		checkDir(TestUtil.MappingDirs.REPEATED_ELEMENTS, format);
-		checkDir(TestUtil.MappingDirs.VALID_WITH_HOLES, format);
+		checkDir(TestUtil.MappingDirs.HOLES, format);
 	}
 
 	private void checkDir(Path dir, MappingFormat format) throws Exception {

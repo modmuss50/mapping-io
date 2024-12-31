@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.lib.jool;
+package net.fabricmc.mappingio.test.lib.jool;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
-import net.fabricmc.mappingio.lib.jool.fi.lang.CheckedRunnable;
+import net.fabricmc.mappingio.test.lib.jool.fi.lang.CheckedRunnable;
 
 /**
  * Improved interoperability between checked exceptions and Java 8.
