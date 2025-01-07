@@ -30,98 +30,26 @@ import org.opentest4j.AssertionFailedError;
 
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.format.MappingFormat;
-import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.TestMappings;
+import net.fabricmc.mappingio.test.TestMappings.MappingDir;
 import net.fabricmc.mappingio.test.visitors.NopMappingVisitor;
 
 public class DetectionTest {
-	private static final Path dir = TestUtil.MappingDirs.DETECTION;
+	private static final MappingDir dir = TestMappings.DETECTION;
 
 	@Test
-	public void enigmaFile() throws Exception {
-		MappingFormat format = MappingFormat.ENIGMA_FILE;
-		check(format);
-	}
-
-	@Test
-	public void enigmaDirectory() throws Exception {
-		MappingFormat format = MappingFormat.ENIGMA_DIR;
-		check(format);
-	}
-
-	@Test
-	public void tinyFile() throws Exception {
-		MappingFormat format = MappingFormat.TINY_FILE;
-		check(format);
-	}
-
-	@Test
-	public void tinyV2File() throws Exception {
-		MappingFormat format = MappingFormat.TINY_2_FILE;
-		check(format);
-	}
-
-	@Test
-	public void srgFile() throws Exception {
-		MappingFormat format = MappingFormat.SRG_FILE;
-		check(format);
-	}
-
-	@Test
-	public void xsrgFile() throws Exception {
-		MappingFormat format = MappingFormat.XSRG_FILE;
-		check(format);
-	}
-
-	@Test
-	public void jamFile() throws Exception {
-		MappingFormat format = MappingFormat.JAM_FILE;
-		check(format);
-	}
-
-	@Test
-	public void csrgFile() throws Exception {
-		MappingFormat format = MappingFormat.CSRG_FILE;
-		check(format);
-	}
-
-	@Test
-	public void tsrgFile() throws Exception {
-		MappingFormat format = MappingFormat.TSRG_FILE;
-		check(format);
-	}
-
-	@Test
-	public void tsrgV2File() throws Exception {
-		MappingFormat format = MappingFormat.TSRG_2_FILE;
-		check(format);
-	}
-
-	@Test
-	public void proguardFile() throws Exception {
-		MappingFormat format = MappingFormat.PROGUARD_FILE;
-		check(format);
-	}
-
-	@Test
-	public void migrationMapFile() throws Exception {
-		MappingFormat format = MappingFormat.INTELLIJ_MIGRATION_MAP_FILE;
-		check(format);
-	}
-
-	@Test
-	public void recafSimpleFile() throws Exception {
-		MappingFormat format = MappingFormat.RECAF_SIMPLE_FILE;
-		assertThrows(AssertionFailedError.class, () -> check(format));
-	}
-
-	@Test
-	public void jobfFile() throws Exception {
-		MappingFormat format = MappingFormat.JOBF_FILE;
-		check(format);
+	public void run() throws Exception {
+		for (MappingFormat format : MappingFormat.values()) {
+			if (format == MappingFormat.RECAF_SIMPLE_FILE) {
+				assertThrows(AssertionFailedError.class, () -> check(format));
+			} else {
+				check(format);
+			}
+		}
 	}
 
 	private void check(MappingFormat format) throws Exception {
-		Path path = dir.resolve(TestUtil.getFileName(format));
+		Path path = dir.pathFor(format);
 		assertEquals(format, MappingReader.detectFormat(path));
 
 		if (!format.hasSingleFile()) return;

@@ -47,11 +47,6 @@ public class EmptyContentReadTest {
 	}
 
 	@Test
-	public void emptyEnigmaFile() throws Exception {
-		EnigmaFileReader.read(new StringReader(""), target);
-	}
-
-	@Test
 	public void emptyTinyFile() throws Exception {
 		String header0 = "";
 		String header1 = "v1";
@@ -86,12 +81,17 @@ public class EmptyContentReadTest {
 	}
 
 	@Test
+	public void emptyEnigmaFile() throws Exception {
+		EnigmaFileReader.read(new StringReader(""), target);
+	}
+
+	@Test
 	public void emptyProguardFile() throws Exception {
 		ProGuardFileReader.read(new StringReader(""), target);
 	}
 
 	@Test
-	public void emptySrgFile() throws Exception {
+	public void emptySrgOrXsrgFile() throws Exception {
 		SrgFileReader.read(new StringReader(""), target);
 	}
 
@@ -101,7 +101,7 @@ public class EmptyContentReadTest {
 	}
 
 	@Test
-	public void emptyTsrgFile() throws Exception {
+	public void emptyCsrgOrTsrgFile() throws Exception {
 		String header0 = "";
 		String header1 = "tsrg2";
 		String header2 = header1 + " ";

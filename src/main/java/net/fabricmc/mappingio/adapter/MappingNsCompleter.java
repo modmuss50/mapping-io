@@ -19,6 +19,7 @@ package net.fabricmc.mappingio.adapter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,19 +36,30 @@ import net.fabricmc.mappingio.MappingVisitor;
  */
 public final class MappingNsCompleter extends ForwardingMappingVisitor {
 	/**
+	 * Constructs a new {@link MappingNsCompleter} which completes all destination namespaces.
+	 *
+	 * @param next The next visitor to forward the data to.
+	 */
+	public MappingNsCompleter(MappingVisitor next) {
+		this(next, null, false);
+	}
+
+	/**
 	 * @param next The next visitor to forward the data to.
 	 * @param alternatives A map of which namespaces should copy from which others.
+	 * Passing {@code null} causes all destination namespaces to be completed.
 	 */
-	public MappingNsCompleter(MappingVisitor next, Map<String, String> alternatives) {
+	public MappingNsCompleter(MappingVisitor next, @Nullable Map<String, String> alternatives) {
 		this(next, alternatives, false);
 	}
 
 	/**
 	 * @param next The next visitor to forward the data to.
 	 * @param alternatives A map of which namespaces should copy from which others.
+	 * Passing {@code null} causes all destination namespaces to be completed.
 	 * @param addMissingNs Whether to copy namespaces from the alternatives key set if not already present.
 	 */
-	public MappingNsCompleter(MappingVisitor next, Map<String, String> alternatives, boolean addMissingNs) {
+	public MappingNsCompleter(MappingVisitor next, @Nullable Map<String, String> alternatives, boolean addMissingNs) {
 		super(next);
 
 		this.alternatives = alternatives;
@@ -63,6 +75,14 @@ public final class MappingNsCompleter extends ForwardingMappingVisitor {
 
 	@Override
 	public void visitNamespaces(String srcNamespace, List<String> dstNamespaces) throws IOException {
+		if (alternatives == null) {
+			alternatives = new HashMap<>(dstNamespaces.size());
+
+			for (String ns : dstNamespaces) {
+				alternatives.put(ns, srcNamespace);
+			}
+		}
+
 		if (addMissingNs) {
 			boolean copied = false;
 
@@ -192,8 +212,8 @@ public final class MappingNsCompleter extends ForwardingMappingVisitor {
 		return next.visitElementContent(targetKind);
 	}
 
-	private final Map<String, String> alternatives;
 	private final boolean addMissingNs;
+	private Map<String, String> alternatives;
 	private int[] alternativesMapping;
 
 	private String srcName;

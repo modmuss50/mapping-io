@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 	public void visitNamespaces(String srcNamespace, List<String> dstNamespaces) throws IOException {
 		String expectedSrcNs = subFeatures.hasNamespaces() ? supTree.getSrcNamespace() : MappingUtil.NS_SOURCE_FALLBACK;
 		assertEquals(expectedSrcNs, srcNamespace, "Incoming mappings have different source namespace than supTree");
-		this.subDstNamespaces = dstNamespaces;
+		subDstNamespaces = new ArrayList<>(dstNamespaces);
 
 		if (!subFeatures.hasNamespaces()) {
 			assertEquals(1, dstNamespaces.size(), "Incoming mappings have multiple namespaces ("
@@ -71,6 +72,7 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 					+ subFormat
 					+ ") declaring not to support them");
 			assertEquals(MappingUtil.NS_TARGET_FALLBACK, dstNamespaces.get(0), "Incoming mappings don't have default destination namespace name of non-namespaced formats");
+			subDstNamespaces.set(0, supTree.getNamespaceName(0)); // TODO: Make this configurable
 			return;
 		}
 
@@ -85,7 +87,16 @@ public class SubsetAssertingVisitor implements FlatMappingVisitor {
 					break;
 				}
 
-				if (i < dstNamespaces.size() - 1) continue;
+				if (i < dstNamespaces.size() - 1) {
+					continue;
+				} else if (supTree.getNamespaceName(0).equals(MappingUtil.NS_TARGET_FALLBACK)) {
+					// None of the incoming namespaces equal supTree's, which uses the fallback namespace.
+					// Let's assume it's equivalent to the first incoming sub namespace.
+					// TODO: Make this configurable
+					subNsIfSupNotNamespaced = 0;
+					subDstNamespaces.set(0, supTree.getNamespaceName(0));
+					break;
+				}
 			}
 
 			assertTrue(contained, "Incoming namespace not contained in supTree: " + dstNs);

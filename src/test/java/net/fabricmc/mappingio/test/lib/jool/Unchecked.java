@@ -21,6 +21,7 @@ import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
 import net.fabricmc.mappingio.test.lib.jool.fi.lang.CheckedRunnable;
+import net.fabricmc.mappingio.test.lib.jool.fi.util.function.CheckedConsumer;
 
 /**
  * Improved interoperability between checked exceptions and Java 8.
@@ -94,6 +95,49 @@ public class Unchecked {
 		return () -> {
 			try {
 				runnable.run();
+			} catch (Throwable e) {
+				handler.accept(e);
+
+				throw new IllegalStateException("Exception handler must throw a RuntimeException", e);
+			}
+		};
+	}
+
+	/**
+	 * Wrap a {@link CheckedConsumer} in a {@link Consumer}.
+	 *
+	 * <p>Example:
+	 * <pre><code>
+	 * Arrays.asList("a", "b").stream().forEach(Unchecked.consumer(s -> {
+	 *     if (s.length() > 10)
+	 *         throw new Exception("Only short strings allowed");
+	 * }));
+	 * </code></pre>
+	 */
+	public static <T> Consumer<T> consumer(CheckedConsumer<T> consumer) {
+		return consumer(consumer, THROWABLE_TO_RUNTIME_EXCEPTION);
+	}
+
+	/**
+	 * Wrap a {@link CheckedConsumer} in a {@link Consumer} with a custom handler for checked exceptions.
+	 *
+	 * <p>Example:
+	 * <pre><code>
+	 * Arrays.asList("a", "b").stream().forEach(Unchecked.consumer(
+	 *     s -> {
+	 *         if (s.length() > 10)
+	 *             throw new Exception("Only short strings allowed");
+	 *     },
+	 *     e -> {
+	 *         throw new IllegalStateException(e);
+	 *     }
+	 * ));
+	 * </code></pre>
+	 */
+	public static <T> Consumer<T> consumer(CheckedConsumer<T> consumer, Consumer<Throwable> handler) {
+		return t -> {
+			try {
+				consumer.accept(t);
 			} catch (Throwable e) {
 				handler.accept(e);
 

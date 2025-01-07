@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -31,11 +30,11 @@ import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingFlag;
-import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.format.MappingFormat;
-import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.TestMappings;
+import net.fabricmc.mappingio.test.TestMappings.MappingDir;
 import net.fabricmc.mappingio.test.visitors.SubsetAssertingVisitor;
 import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MappingTree;
@@ -44,112 +43,33 @@ import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public class VisitEndTest {
 	@Test
-	public void enigmaFile() throws Exception {
-		MappingFormat format = MappingFormat.ENIGMA_FILE;
-		check(format);
+	public void run() throws Exception {
+		for (MappingDir dir : TestMappings.values()) {
+			for (MappingFormat format : MappingFormat.values()) {
+				check(dir, format);
+			}
+		}
 	}
 
-	@Test
-	public void enigmaDirectory() throws Exception {
-		MappingFormat format = MappingFormat.ENIGMA_DIR;
-		check(format);
-	}
+	private void check(MappingDir dir, MappingFormat format) throws Exception {
+		if (!Files.exists(dir.pathFor(format))) {
+			return;
+		}
 
-	@Test
-	public void tinyFile() throws Exception {
-		MappingFormat format = MappingFormat.TINY_FILE;
-		check(format);
-	}
+		MappingTreeView supTree = dir.supportsGeneration()
+				? dir.generate(new MemoryMappingTree())
+				: null;
 
-	@Test
-	public void tinyV2File() throws Exception {
-		MappingFormat format = MappingFormat.TINY_2_FILE;
-		check(format);
-	}
+		checkCompliance(dir, format, 1, true, supTree);
+		checkCompliance(dir, format, 1, false, supTree);
 
-	@Test
-	public void srgFile() throws Exception {
-		MappingFormat format = MappingFormat.SRG_FILE;
-		check(format);
-	}
+		checkCompliance(dir, format, 2, true, supTree);
+		checkCompliance(dir, format, 3, true, supTree);
 
-	@Test
-	public void xrgFile() throws Exception {
-		MappingFormat format = MappingFormat.XSRG_FILE;
-		check(format);
-	}
-
-	@Test
-	public void jamFile() throws Exception {
-		MappingFormat format = MappingFormat.JAM_FILE;
-		check(format);
-	}
-
-	@Test
-	public void csrgFile() throws Exception {
-		MappingFormat format = MappingFormat.CSRG_FILE;
-		check(format);
-	}
-
-	@Test
-	public void tsrgFile() throws Exception {
-		MappingFormat format = MappingFormat.TSRG_FILE;
-		check(format);
-	}
-
-	@Test
-	public void tsrgV2File() throws Exception {
-		MappingFormat format = MappingFormat.TSRG_2_FILE;
-		check(format);
-	}
-
-	@Test
-	public void proguardFile() throws Exception {
-		MappingFormat format = MappingFormat.PROGUARD_FILE;
-		check(format);
-	}
-
-	@Test
-	public void migrationMapFile() throws Exception {
-		MappingFormat format = MappingFormat.INTELLIJ_MIGRATION_MAP_FILE;
-		check(format);
-	}
-
-	@Test
-	public void recafSimpleFile() throws Exception {
-		MappingFormat format = MappingFormat.RECAF_SIMPLE_FILE;
-		check(format);
-	}
-
-	@Test
-	public void jobfFile() throws Exception {
-		MappingFormat format = MappingFormat.JOBF_FILE;
-		check(format);
-	}
-
-	private void check(MappingFormat format) throws Exception {
-		checkDir(TestUtil.MappingDirs.DETECTION, format);
-		checkDir(TestUtil.MappingDirs.VALID, format);
-		checkDir(TestUtil.MappingDirs.REPEATED_ELEMENTS, format);
-		checkDir(TestUtil.MappingDirs.HOLES, format);
-	}
-
-	private void checkDir(Path dir, MappingFormat format) throws Exception {
-		Path path = dir.resolve(TestUtil.getFileName(format));
-		if (!Files.exists(path)) return;
-
-		MappingTreeView supTree = TestUtil.MappingDirs.getCorrespondingTree(dir);
-
-		checkCompliance(format, path, 1, true, supTree);
-		checkCompliance(format, path, 1, false, supTree);
-
-		checkCompliance(format, path, 2, true, supTree);
-		checkCompliance(format, path, 3, true, supTree);
-
-		VisitEndTestVisitor nonFlaggedVisitor;
+		VisitEndComplianceChecker nonFlaggedVisitor;
 
 		try {
-			nonFlaggedVisitor = checkCompliance(format, path, 2, false, supTree);
+			nonFlaggedVisitor = checkCompliance(dir, format, 2, false, supTree);
 		} catch (Exception e) {
 			return; // Reader doesn't support multiple passes without NEEDS_MULTIPLE_PASSES
 		}
@@ -158,19 +78,20 @@ public class VisitEndTest {
 		assertEquals(nonFlaggedVisitor.finishedVisitPassCount, nonFlaggedVisitor.visitPassCountToFinish);
 	}
 
-	private VisitEndTestVisitor checkCompliance(MappingFormat format, Path path, int visitPassCountToFinish, boolean setFlag, MappingTreeView supTree) throws Exception {
-		VisitEndTestVisitor visitor = new VisitEndTestVisitor(visitPassCountToFinish, setFlag, supTree, format);
-		MappingReader.read(path, format, new VisitOrderVerifyingVisitor(visitor));
+	private VisitEndComplianceChecker checkCompliance(MappingDir dir, MappingFormat format, int visitPassCountToFinish, boolean setFlag, MappingTreeView supTree) throws Exception {
+		VisitEndComplianceChecker visitor = new VisitEndComplianceChecker(visitPassCountToFinish, setFlag, supTree, format, dir);
+		dir.read(format, new VisitOrderVerifyingVisitor(visitor));
 		assertEquals(visitor.finishedVisitPassCount, visitPassCountToFinish);
 		return visitor;
 	}
 
-	private static class VisitEndTestVisitor implements MappingVisitor {
-		private VisitEndTestVisitor(int visitPassCountToFinish, boolean setFlag, MappingTreeView supTree, MappingFormat subFormat) {
+	private static class VisitEndComplianceChecker implements MappingVisitor {
+		private VisitEndComplianceChecker(int visitPassCountToFinish, boolean setFlag, MappingTreeView supTree, MappingFormat subFormat, MappingDir dir) {
 			this.visitPassCountToFinish = visitPassCountToFinish;
 			this.setFlag = setFlag;
 			this.supTree = supTree;
 			this.subFormat = subFormat;
+			this.dir = dir;
 			this.tree = new MemoryMappingTree();
 			this.oldTrees = new MappingTree[visitPassCountToFinish - 1];
 		}
@@ -303,6 +224,10 @@ public class VisitEndTest {
 				if (finishedVisitPassCount > 1) supFormat = subFormat;
 			}
 
+			if (dir == TestMappings.PROPAGATION.UNPROPAGATED && subFormat == MappingFormat.ENIGMA_FILE) {
+				return;
+			}
+
 			subTree = tree;
 			subTree.accept(new FlatAsRegularMappingVisitor(new SubsetAssertingVisitor(supTree, supFormat, subFormat)));
 			supTree.accept(new FlatAsRegularMappingVisitor(new SubsetAssertingVisitor(subTree, subFormat, supFormat)));
@@ -312,6 +237,7 @@ public class VisitEndTest {
 		private final boolean setFlag;
 		private final MappingTreeView supTree;
 		private final MappingFormat subFormat;
+		private final MappingDir dir;
 		private final MappingTree[] oldTrees;
 		private int finishedVisitPassCount;
 		private MemoryMappingTree tree;

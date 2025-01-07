@@ -18,22 +18,22 @@ package net.fabricmc.mappingio.test.tests.writing;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.neoforged.srgutils.IMappingFile;
 import net.neoforged.srgutils.INamedMappingFile;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingReader;
+import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.MappingWriter;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.adapter.ForwardingMappingVisitor;
 import net.fabricmc.mappingio.adapter.MappingNsCompleter;
 import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.test.TestMappings;
+import net.fabricmc.mappingio.test.TestMappings.MappingDir;
 import net.fabricmc.mappingio.test.TestUtil;
 import net.fabricmc.mappingio.test.visitors.SubsetAssertingVisitor;
 import net.fabricmc.mappingio.tree.MappingTreeView;
@@ -42,116 +42,44 @@ import net.fabricmc.mappingio.tree.VisitableMappingTree;
 
 public class WriteTest {
 	@TempDir
-	private static Path dir;
-	private static MappingTreeView validTree;
-	private static Map<String, String> treeNsAltMap = new HashMap<>();
-	private static MappingTreeView validWithRepeatsTree;
-	private static Map<String, String> treeWithRepeatsNsAltMap = new HashMap<>();
-	private static MappingTreeView validWithHolesTree;
-	private static Map<String, String> treeWithHolesNsAltMap = new HashMap<>();
-
-	@BeforeAll
-	public static void setup() throws Exception {
-		validTree = TestUtil.acceptTestMappings(new MemoryMappingTree());
-		treeNsAltMap.put(validTree.getDstNamespaces().get(0), validTree.getSrcNamespace());
-		treeNsAltMap.put(validTree.getDstNamespaces().get(1), validTree.getSrcNamespace());
-
-		validWithRepeatsTree = TestUtil.acceptTestMappingsWithRepeats(new MemoryMappingTree(), true, true);
-		treeWithRepeatsNsAltMap.put(validWithRepeatsTree.getDstNamespaces().get(0), validWithRepeatsTree.getSrcNamespace());
-		treeWithRepeatsNsAltMap.put(validWithRepeatsTree.getDstNamespaces().get(1), validWithRepeatsTree.getSrcNamespace());
-
-		validWithHolesTree = TestUtil.acceptTestMappingsWithHoles(new MemoryMappingTree());
-		treeWithHolesNsAltMap.put(validWithHolesTree.getDstNamespaces().get(0), validWithHolesTree.getSrcNamespace());
-		treeWithHolesNsAltMap.put(validWithHolesTree.getDstNamespaces().get(1), validWithHolesTree.getSrcNamespace());
-	}
+	private static Path targetDir;
 
 	@Test
-	public void enigmaFile() throws Exception {
-		check(MappingFormat.ENIGMA_FILE);
+	public void run() throws Exception {
+		for (MappingDir dir : TestMappings.values()) {
+			for (MappingFormat format : MappingFormat.values()) {
+				check(dir, format);
+			}
+		}
 	}
 
-	@Test
-	public void enigmaDirectory() throws Exception {
-		check(MappingFormat.ENIGMA_DIR);
-	}
+	private void check(MappingDir dir, MappingFormat format) throws Exception {
+		if (!dir.supportsGeneration() || !format.hasWriter) {
+			return;
+		}
 
-	@Test
-	public void tinyFile() throws Exception {
-		check(MappingFormat.TINY_FILE);
-	}
+		Path path = targetDir.resolve(TestUtil.getFileName(format));
+		MappingTreeView tree = dir.generate(new MemoryMappingTree());
+		MappingVisitor target = MappingWriter.create(path, format);
 
-	@Test
-	public void tinyV2File() throws Exception {
-		check(MappingFormat.TINY_2_FILE);
-	}
+		if (dir.isIn(TestMappings.PROPAGATION.BASE_DIR) && !format.features().hasNamespaces()) {
+			target = new MappingNsCompleter(target);
+		}
 
-	@Test
-	public void srgFile() throws Exception {
-		check(MappingFormat.SRG_FILE);
-	}
+		if (dir == TestMappings.READING.REPEATED_ELEMENTS) {
+			boolean isEnigma = format == MappingFormat.ENIGMA_FILE || format == MappingFormat.ENIGMA_DIR;
+			TestMappings.generateRepeatedElements(target, !isEnigma, !isEnigma);
+		} else {
+			dir.generate(target);
+		}
 
-	@Test
-	public void xsrgFile() throws Exception {
-		check(MappingFormat.XSRG_FILE);
-	}
+		if (!(dir == TestMappings.PROPAGATION.UNPROPAGATED && format == MappingFormat.ENIGMA_FILE)) {
+			// See ValidContentReadTest for explanation
+			readWithMio(tree, path, format);
+		}
 
-	@Test
-	public void jamFile() throws Exception {
-		check(MappingFormat.JAM_FILE);
-	}
-
-	@Test
-	public void csrgFile() throws Exception {
-		check(MappingFormat.CSRG_FILE);
-	}
-
-	@Test
-	public void tsrgFile() throws Exception {
-		check(MappingFormat.TSRG_FILE);
-	}
-
-	@Test
-	public void tsrgV2File() throws Exception {
-		check(MappingFormat.TSRG_2_FILE);
-	}
-
-	@Test
-	public void proguardFile() throws Exception {
-		check(MappingFormat.PROGUARD_FILE);
-	}
-
-	@Test
-	public void migrationMapFile() throws Exception {
-		check(MappingFormat.INTELLIJ_MIGRATION_MAP_FILE);
-	}
-
-	@Test
-	public void recafSimpleFile() throws Exception {
-		check(MappingFormat.RECAF_SIMPLE_FILE);
-	}
-
-	@Test
-	public void jobfFile() throws Exception {
-		check(MappingFormat.JOBF_FILE);
-	}
-
-	private void check(MappingFormat format) throws Exception {
-		Path path = dir.resolve(TestUtil.getFileName(format));
-		TestUtil.acceptTestMappings(MappingWriter.create(path, format));
-		readWithMio(validTree, path, format);
 		readWithLorenz(path, format);
-		readWithSrgUtils(validTree, format, treeNsAltMap);
-
-		boolean isEnigma = format == MappingFormat.ENIGMA_FILE || format == MappingFormat.ENIGMA_DIR;
-		TestUtil.acceptTestMappingsWithRepeats(MappingWriter.create(path, format), !isEnigma, !isEnigma);
-		readWithMio(validWithRepeatsTree, path, format);
-		readWithLorenz(path, format);
-		readWithSrgUtils(validWithRepeatsTree, format, treeWithRepeatsNsAltMap);
-
-		TestUtil.acceptTestMappingsWithHoles(MappingWriter.create(path, format));
-		readWithMio(validWithHolesTree, path, format);
-		readWithLorenz(path, format);
-		readWithSrgUtils(validWithHolesTree, format, treeWithHolesNsAltMap);
+		readWithSrgUtils(tree, format);
 	}
 
 	private void readWithMio(MappingTreeView origTree, Path outputPath, MappingFormat outputFormat) throws Exception {
@@ -168,7 +96,7 @@ public class WriteTest {
 		lorenzFormat.read(path);
 	}
 
-	private void readWithSrgUtils(MappingTreeView tree, MappingFormat format, Map<String, String> nsAltMap) throws Exception {
+	private void readWithSrgUtils(MappingTreeView tree, MappingFormat format) throws Exception {
 		IMappingFile.Format srgUtilsFormat = TestUtil.toSrgUtilsFormat(format);
 		if (srgUtilsFormat == null) return;
 
@@ -186,10 +114,9 @@ public class WriteTest {
 							public boolean visitElementContent(MappedElementKind targetKind) throws IOException {
 								return !(format == MappingFormat.TINY_2_FILE && targetKind == MappedElementKind.METHOD_VAR);
 							}
-						},
-				nsAltMap));
+						}));
 
-		Path path = TestUtil.writeToDir(dstNsCompTree, dir, format);
+		Path path = TestUtil.writeToDir(dstNsCompTree, targetDir, format);
 		INamedMappingFile.load(path.toFile());
 	}
 }

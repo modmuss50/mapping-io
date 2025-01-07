@@ -14,104 +14,108 @@
  * limitations under the License.
  */
 
-package net.fabricmc.mappingio.test.tests.adapter;
+package net.fabricmc.mappingio.test.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingFlag;
 import net.fabricmc.mappingio.MappingVisitor;
+import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.adapter.OuterClassNamePropagator;
+import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.test.TestMappings;
+import net.fabricmc.mappingio.test.TestMappings.MappingDir;
 import net.fabricmc.mappingio.test.visitors.NopMappingVisitor;
-import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
+import net.fabricmc.mappingio.test.visitors.SubsetAssertingVisitor;
+import net.fabricmc.mappingio.tree.MappingTreeView;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import net.fabricmc.mappingio.tree.VisitableMappingTree;
 
-public class OuterClassNamePropagatorTest {
-	private static void accept(MappingVisitor visitor) throws IOException {
-		visitor = new VisitOrderVerifyingVisitor(visitor);
+public class OuterClassNamePropagationTest {
+	private static String srcNamespace;
+	private static List<String> dstNamespaces;
+	private static String invalidNs = "invalid";
 
-		do {
-			if (visitor.visitHeader()) {
-				visitor.visitNamespaces("source", Arrays.asList("dstNs0", "dstNs1", "dstNs2", "dstNs3", "dstNs4", "dstNs5", "dstNs6"));
-			}
+	@BeforeAll
+	public static void setup() throws IOException {
+		MappingTreeView tree = acceptMappings(new MemoryMappingTree());
+		srcNamespace = tree.getSrcNamespace();
+		dstNamespaces = tree.getDstNamespaces();
 
-			if (visitor.visitContent()) {
-				if (visitor.visitClass("class_1")) {
-					visitor.visitDstName(MappedElementKind.CLASS, 0, "class1Ns0Rename");
-					visitor.visitDstName(MappedElementKind.CLASS, 1, "class1Ns1Rename");
-					visitor.visitDstName(MappedElementKind.CLASS, 2, "class1Ns2Rename");
-					visitor.visitDstName(MappedElementKind.CLASS, 4, "class1Ns4Rename");
+		assert !srcNamespace.equals(invalidNs);
+		assert !dstNamespaces.contains(invalidNs);
+	}
 
-					if (visitor.visitElementContent(MappedElementKind.CLASS)) {
-						if (visitor.visitField("field_1", "Lclass_1;")) {
-							for (int i = 0; i <= 6; i++) {
-								visitor.visitDstDesc(MappedElementKind.FIELD, i, "Lclass_1;");
-							}
-
-							visitor.visitElementContent(MappedElementKind.FIELD);
-						}
-					}
-				}
-
-				if (visitor.visitClass("class_1$class_2")) {
-					visitor.visitDstName(MappedElementKind.CLASS, 2, "class1Ns2Rename$class2Ns2Rename");
-					visitor.visitDstName(MappedElementKind.CLASS, 3, "class_1$class2Ns3Rename");
-					visitor.visitDstName(MappedElementKind.CLASS, 4, "class_1$class_2");
-					visitor.visitDstName(MappedElementKind.CLASS, 5, "class_1$class2Ns5Rename");
-
-					if (visitor.visitElementContent(MappedElementKind.CLASS)) {
-						if (visitor.visitField("field_2", "Lclass_1$class_2;")) {
-							for (int i = 0; i <= 6; i++) {
-								visitor.visitDstDesc(MappedElementKind.FIELD, i, "Lclass_1$class_2;");
-							}
-
-							visitor.visitElementContent(MappedElementKind.FIELD);
-						}
-					}
-				}
-
-				if (visitor.visitClass("class_1$class_2$class_3")) {
-					visitor.visitDstName(MappedElementKind.CLASS, 5, "class_1$class2Ns5Rename$class3Ns5Rename");
-					visitor.visitDstName(MappedElementKind.CLASS, 6, "class_1$class_2$class3Ns6Rename");
-
-					if (visitor.visitElementContent(MappedElementKind.CLASS)) {
-						if (visitor.visitField("field_2", "Lclass_1$class_2$class_3;")) {
-							for (int i = 0; i <= 6; i++) {
-								visitor.visitDstDesc(MappedElementKind.FIELD, i, "Lclass_1$class_2$class_3;");
-							}
-
-							visitor.visitElementContent(MappedElementKind.FIELD);
-						}
-					}
-				}
-			}
-		} while (!visitor.visitEnd());
+	private static <T extends MappingVisitor> T acceptMappings(T visitor) throws IOException {
+		return TestMappings.generateOuterClassNamePropagation(visitor);
 	}
 
 	@Test
-	public void directVisit() throws IOException {
-		accept(new OuterClassNamePropagator(new CheckingVisitor(false)));
+	public void visitor() throws IOException {
+		acceptMappings(new OuterClassNamePropagator(
+				new OuterClassNameChecker(false, dstNamespaces, true)));
+
+		for (int pass = 1; pass <= 2; pass++) {
+			boolean processRemappedDstNames = pass == 1;
+
+			acceptMappings(new OuterClassNamePropagator(
+					new OuterClassNameChecker(false, dstNamespaces, processRemappedDstNames),
+					dstNamespaces,
+					processRemappedDstNames));
+		}
+
+		assertThrows(UnsupportedOperationException.class, () -> acceptMappings(new OuterClassNamePropagator(
+				new NopMappingVisitor(false),
+				Collections.singletonList(srcNamespace),
+				false)));
+		assertThrows(IllegalArgumentException.class, () -> acceptMappings(new OuterClassNamePropagator(
+				new NopMappingVisitor(false),
+				Collections.singletonList(invalidNs),
+				false)));
 	}
 
 	@Test
-	public void tree() throws IOException {
-		VisitableMappingTree tree = new MemoryMappingTree();
-		accept(new OuterClassNamePropagator(tree));
-		tree.accept(new CheckingVisitor(true));
+	public void visitorThroughTree() throws IOException {
+		for (int pass = 1; pass <= 2; pass++) {
+			boolean processRemappedDstNames = pass == 1;
+
+			VisitableMappingTree tree = new MemoryMappingTree();
+			acceptMappings(new OuterClassNamePropagator(tree, dstNamespaces, processRemappedDstNames));
+			tree.accept(new OuterClassNameChecker(true, dstNamespaces, processRemappedDstNames));
+
+			checkDiskEquivalence(tree, processRemappedDstNames);
+		}
 	}
 
-	private static class CheckingVisitor extends NopMappingVisitor {
-		CheckingVisitor(boolean tree) {
+	private void checkDiskEquivalence(VisitableMappingTree tree, boolean processRemappedDstNames) throws IOException {
+		for (MappingFormat format : MappingFormat.values()) {
+			MappingDir dir = processRemappedDstNames
+					? TestMappings.PROPAGATION.PROPAGATED
+					: TestMappings.PROPAGATION.PROPAGATED_EXCEPT_REMAPPED_DST;
+
+			VisitableMappingTree diskTree = dir.read(format, new MemoryMappingTree());
+
+			tree.accept(new FlatAsRegularMappingVisitor(new SubsetAssertingVisitor(diskTree, format, null)));
+			diskTree.accept(new FlatAsRegularMappingVisitor(new SubsetAssertingVisitor(tree, null, format)));
+		}
+	}
+
+	private static class OuterClassNameChecker extends NopMappingVisitor {
+		OuterClassNameChecker(boolean mappingsPassedThroughTree, List<String> dstNamespaces, boolean processRemappedDstNames) {
 			super(true);
-			this.tree = tree;
+			this.tree = mappingsPassedThroughTree;
+			this.processRemappedDstNames = processRemappedDstNames;
 		}
 
 		@Override
@@ -131,7 +135,28 @@ public class OuterClassNamePropagatorTest {
 
 			switch (clsSrcName) {
 			case "class_1":
-				assertEquals("Lclass_1;", desc);
+				if (!tree) {
+					assertEquals("Lclass_1;", desc);
+					break;
+				}
+
+				switch (namespace) {
+				case 0:
+					assertEquals("Lclass1Ns0Rename;", desc);
+					break;
+				case 1:
+					assertEquals("Lclass1Ns1Rename;", desc);
+					break;
+				case 2:
+					assertEquals("Lclass1Ns2Rename;", desc);
+					break;
+				case 4:
+					assertEquals("Lclass1Ns4Rename;", desc);
+					break;
+				default:
+					throw new IllegalStateException();
+				}
+
 				break;
 			case "class_1$class_2":
 				switch (namespace) {
@@ -148,7 +173,7 @@ public class OuterClassNamePropagatorTest {
 					assertEquals("Lclass_1$class2Ns3Rename;", desc);
 					break;
 				case 4:
-					assertEquals("Lclass_1$class_2;", desc);
+					assertEquals("Lclass1Ns4Rename$class_2;", desc);
 					break;
 				case 5:
 					assertEquals("Lclass_1$class2Ns5Rename;", desc);
@@ -176,10 +201,14 @@ public class OuterClassNamePropagatorTest {
 					assertEquals("Lclass_1$class2Ns3Rename$class_3;", desc);
 					break;
 				case 4:
-					assertEquals("Lclass_1$class_2$class_3;", desc);
+					assertEquals("Lclass1Ns4Rename$class_2$class_3;", desc);
 					break;
 				case 5:
-					assertEquals("Lclass_1$class2Ns5Rename$class3Ns5Rename;", desc);
+					assertEquals(
+							processRemappedDstNames
+									? "Lclass_1$class2Ns5Rename$class3Ns5Rename;"
+									: "Lclass_1$class_2$class3Ns5Rename;",
+							desc);
 					break;
 				case 6:
 					assertEquals("Lclass_1$class_2$class3Ns6Rename;", desc);
@@ -216,7 +245,7 @@ public class OuterClassNamePropagatorTest {
 					assertEquals("class_1$class2Ns3Rename", name);
 					break;
 				case 4:
-					assertEquals("class_1$class_2", name);
+					assertEquals("class1Ns4Rename$class_2", name);
 					break;
 				case 5:
 					assertEquals("class_1$class2Ns5Rename", name);
@@ -244,10 +273,14 @@ public class OuterClassNamePropagatorTest {
 					assertEquals("class_1$class2Ns3Rename$class_3", name);
 					break;
 				case 4:
-					assertEquals("class_1$class_2$class_3", name);
+					assertEquals("class1Ns4Rename$class_2$class_3", name);
 					break;
 				case 5:
-					assertEquals("class_1$class2Ns5Rename$class3Ns5Rename", name);
+					assertEquals(
+							processRemappedDstNames
+									? "class_1$class2Ns5Rename$class3Ns5Rename"
+									: "class_1$class_2$class3Ns5Rename",
+							name);
 					break;
 				case 6:
 					assertEquals("class_1$class_2$class3Ns6Rename", name);
@@ -268,6 +301,7 @@ public class OuterClassNamePropagatorTest {
 		}
 
 		private final boolean tree;
+		private final boolean processRemappedDstNames;
 		private byte passesDone = 0;
 		private String clsSrcName;
 	}

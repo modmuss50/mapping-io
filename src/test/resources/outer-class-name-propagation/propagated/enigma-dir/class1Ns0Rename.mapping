@@ -1,0 +1,6 @@
+CLASS class_1 class1Ns0Rename
+	FIELD field_1 field_1 Lclass_1;
+	CLASS class_2
+		FIELD field_2 field_2 Lclass_1$class_2;
+		CLASS class_3
+			FIELD field_2 field_2 Lclass_1$class_2$class_3;

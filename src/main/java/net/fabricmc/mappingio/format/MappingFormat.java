@@ -115,6 +115,27 @@ public enum MappingFormat {
 	ENIGMA_DIR("Enigma directory", null, true, FeatureSetBuilder.createFrom(ENIGMA_FILE.features)),
 
 	/**
+	 * ProGuard's mapping format, as specified <a href="https://www.guardsquare.com/manual/tools/retrace">here</a>.
+	 *
+	 * @implNote Line numbers are currently not supported.
+	 */
+	PROGUARD_FILE("ProGuard file", "txt", true, FeatureSetBuilder.create()
+			.withElementMetadata(MetadataSupport.FIXED) // line numbers
+			.withClasses(c -> c
+					.withSrcNames(FeaturePresence.REQUIRED)
+					.withDstNames(FeaturePresence.REQUIRED)
+					.withRepackaging(true))
+			.withFields(f -> f
+					.withSrcNames(FeaturePresence.REQUIRED)
+					.withDstNames(FeaturePresence.REQUIRED)
+					.withSrcDescs(FeaturePresence.REQUIRED))
+			.withMethods(m -> m
+					.withSrcNames(FeaturePresence.REQUIRED)
+					.withDstNames(FeaturePresence.REQUIRED)
+					.withSrcDescs(FeaturePresence.REQUIRED))
+			.withFileComments(true)),
+
+	/**
 	 * The {@code SRG} ("Searge RetroGuard") mapping format, as specified <a href="https://github.com/MinecraftForge/SrgUtils/blob/67f30647ece29f18256ca89a23cda6216d6bd21e/src/main/java/net/minecraftforge/srgutils/InternalUtils.java#L69-L81">here</a>.
 	 *
 	 * @implNote Package mappings are currently not supported.
@@ -197,27 +218,6 @@ public enum MappingFormat {
 					.withLvIndices(FeaturePresence.REQUIRED)
 					.withSrcNames(FeaturePresence.REQUIRED)
 					.withDstNames(FeaturePresence.REQUIRED))),
-
-	/**
-	 * ProGuard's mapping format, as specified <a href="https://www.guardsquare.com/manual/tools/retrace">here</a>.
-	 *
-	 * @implNote Line numbers are currently not supported.
-	 */
-	PROGUARD_FILE("ProGuard file", "txt", true, FeatureSetBuilder.create()
-			.withElementMetadata(MetadataSupport.FIXED) // line numbers
-			.withClasses(c -> c
-					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.REQUIRED)
-					.withRepackaging(true))
-			.withFields(f -> f
-					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.REQUIRED)
-					.withSrcDescs(FeaturePresence.REQUIRED))
-			.withMethods(m -> m
-					.withSrcNames(FeaturePresence.REQUIRED)
-					.withDstNames(FeaturePresence.REQUIRED)
-					.withSrcDescs(FeaturePresence.REQUIRED))
-			.withFileComments(true)),
 
 	/**
 	 * The IntelliJ IDEA migration map format, as implemented <a href="https://github.com/JetBrains/intellij-community/tree/5b6191dd34e05de8897f5da68757146395a260cc/java/java-impl-refactorings/src/com/intellij/refactoring/migration">here</a>.

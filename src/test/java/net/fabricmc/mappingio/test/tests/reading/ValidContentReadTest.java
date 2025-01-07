@@ -16,16 +16,18 @@
 
 package net.fabricmc.mappingio.test.tests.reading;
 
-import java.nio.file.Path;
+import java.nio.file.Files;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import net.fabricmc.mappingio.MappingReader;
+import net.fabricmc.mappingio.MappingUtil;
+import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.adapter.FlatAsRegularMappingVisitor;
 import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch;
 import net.fabricmc.mappingio.format.MappingFormat;
-import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.TestMappings;
+import net.fabricmc.mappingio.test.TestMappings.MappingDir;
 import net.fabricmc.mappingio.test.visitors.SubsetAssertingVisitor;
 import net.fabricmc.mappingio.test.visitors.VisitOrderVerifyingVisitor;
 import net.fabricmc.mappingio.tree.MappingTreeView;
@@ -34,167 +36,52 @@ import net.fabricmc.mappingio.tree.VisitableMappingTree;
 
 public class ValidContentReadTest {
 	@Test
-	public void enigmaFile() throws Exception {
-		MappingFormat format = MappingFormat.ENIGMA_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
+	public void run() throws Exception {
+		for (MappingDir dir : TestMappings.values()) {
+			for (MappingFormat format : MappingFormat.values()) {
+				check(dir, format);
+			}
+		}
 	}
 
-	@Test
-	public void enigmaDirectory() throws Exception {
-		MappingFormat format = MappingFormat.ENIGMA_DIR;
-		checkDefault(format);
-		checkHoles(format);
-	}
+	private void check(MappingDir dir, MappingFormat format) throws Exception {
+		if (!dir.supportsGeneration() || !Files.exists(dir.pathFor(format))) {
+			return;
+		}
 
-	@Test
-	public void tinyFile() throws Exception {
-		MappingFormat format = MappingFormat.TINY_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
+		if (dir == TestMappings.PROPAGATION.UNPROPAGATED && format == MappingFormat.ENIGMA_FILE) {
+			// Enigma files cannot represent unpropagated outer class names,
+			// they are always propagated automatically since inner classes are stored as children of outer classes.
+			// The directory format on the other hand is able to do so by storing the classes in separate files.
+			return;
+		}
 
-	@Test
-	public void tinyV2File() throws Exception {
-		MappingFormat format = MappingFormat.TINY_2_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true); // TODO: The Tiny v2 spec disallows repeated elements, there should at least be a warning
-	}
+		// TODO: The Tiny v2 spec also disallows repeated elements, there should at least be warnings
+		boolean allowConsecutiveDuplicateElementVisits = dir == TestMappings.READING.REPEATED_ELEMENTS;
 
-	@Test
-	public void srgFile() throws Exception {
-		MappingFormat format = MappingFormat.SRG_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void xsrgFile() throws Exception {
-		MappingFormat format = MappingFormat.XSRG_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void jamFile() throws Exception {
-		MappingFormat format = MappingFormat.JAM_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void csrgFile() throws Exception {
-		MappingFormat format = MappingFormat.CSRG_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void tsrgFile() throws Exception {
-		MappingFormat format = MappingFormat.TSRG_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void tsrgV2File() throws Exception {
-		MappingFormat format = MappingFormat.TSRG_2_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void proguardFile() throws Exception {
-		MappingFormat format = MappingFormat.PROGUARD_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void migrationMapFile() throws Exception {
-		MappingFormat format = MappingFormat.INTELLIJ_MIGRATION_MAP_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void recafSimpleFile() throws Exception {
-		MappingFormat format = MappingFormat.RECAF_SIMPLE_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	@Test
-	public void jobfFile() throws Exception {
-		MappingFormat format = MappingFormat.JOBF_FILE;
-		checkDefault(format);
-		checkHoles(format);
-		checkRepeated(format, true);
-	}
-
-	private void checkDefault(MappingFormat format) throws Exception {
-		Path path = TestUtil.MappingDirs.VALID.resolve(TestUtil.getFileName(format));
-
-		VisitableMappingTree referenceTree = TestUtil.acceptTestMappings(new MemoryMappingTree());
+		VisitableMappingTree referenceTree = dir.generate(new MemoryMappingTree());
 		VisitableMappingTree tree = new MemoryMappingTree();
-		boolean allowConsecutiveDuplicateElementVisits = false;
 
-		MappingReader.read(path, format, new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits));
+		dir.read(format, new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits));
 		assertEqual(tree, format, referenceTree, allowConsecutiveDuplicateElementVisits);
+
+		if (dir == TestMappings.READING.HOLES && !format.features().hasNamespaces()) {
+			return;
+		}
 
 		tree = new MemoryMappingTree();
-		MappingReader.read(path, format,
-				new MappingSourceNsSwitch(
-						new VisitOrderVerifyingVisitor(
-								new MappingSourceNsSwitch(
-										new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits),
-										referenceTree.getSrcNamespace()),
-								allowConsecutiveDuplicateElementVisits),
-						referenceTree.getDstNamespaces().get(0)));
-		assertEqual(tree, format, referenceTree, allowConsecutiveDuplicateElementVisits);
-	}
+		String newSrcNs = format.features().hasNamespaces()
+				? referenceTree.getDstNamespaces().get(0)
+				: MappingUtil.NS_TARGET_FALLBACK;
+		MappingVisitor target = new MappingSourceNsSwitch(
+				new VisitOrderVerifyingVisitor(
+						new MappingSourceNsSwitch(
+								new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits),
+								referenceTree.getSrcNamespace()),
+						allowConsecutiveDuplicateElementVisits),
+				newSrcNs);
 
-	private void checkRepeated(MappingFormat format, boolean allowConsecutiveDuplicateElementVisits) throws Exception {
-		Path path = TestUtil.MappingDirs.REPEATED_ELEMENTS.resolve(TestUtil.getFileName(format));
-
-		VisitableMappingTree referenceTree = TestUtil.acceptTestMappingsWithRepeats(new MemoryMappingTree(), true, true);
-		VisitableMappingTree tree = new MemoryMappingTree();
-
-		MappingReader.read(path, format, new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits));
-		assertEqual(tree, format, referenceTree, allowConsecutiveDuplicateElementVisits);
-
-		tree = new MemoryMappingTree();
-		MappingReader.read(path, format,
-				new MappingSourceNsSwitch(
-						new VisitOrderVerifyingVisitor(
-								new MappingSourceNsSwitch(
-										new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits),
-										referenceTree.getSrcNamespace()),
-								allowConsecutiveDuplicateElementVisits),
-						referenceTree.getDstNamespaces().get(0)));
-		assertEqual(tree, format, referenceTree, allowConsecutiveDuplicateElementVisits);
-	}
-
-	private void checkHoles(MappingFormat format) throws Exception {
-		Path path = TestUtil.MappingDirs.HOLES.resolve(TestUtil.getFileName(format));
-
-		VisitableMappingTree referenceTree = TestUtil.acceptTestMappingsWithHoles(new MemoryMappingTree());
-		VisitableMappingTree tree = new MemoryMappingTree();
-		boolean allowConsecutiveDuplicateElementVisits = false;
-
-		MappingReader.read(path, format, new VisitOrderVerifyingVisitor(tree, allowConsecutiveDuplicateElementVisits));
+		dir.read(format, target);
 		assertEqual(tree, format, referenceTree, allowConsecutiveDuplicateElementVisits);
 	}
 
@@ -204,10 +91,9 @@ public class ValidContentReadTest {
 	}
 
 	private void assertSubset(MappingTreeView subTree, @Nullable MappingFormat subFormat, MappingTreeView supTree, @Nullable MappingFormat supFormat, boolean allowConsecutiveDuplicateElementVisits) throws Exception {
-		subTree.accept(
-				new VisitOrderVerifyingVisitor(
-						new FlatAsRegularMappingVisitor(
-								new SubsetAssertingVisitor(supTree, supFormat, subFormat)),
-						allowConsecutiveDuplicateElementVisits));
+		subTree.accept(new VisitOrderVerifyingVisitor(
+				new FlatAsRegularMappingVisitor(
+						new SubsetAssertingVisitor(supTree, supFormat, subFormat)),
+				allowConsecutiveDuplicateElementVisits));
 	}
 }

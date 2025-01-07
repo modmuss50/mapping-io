@@ -17,31 +17,67 @@
 package net.fabricmc.mappingio.test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
+import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.MappingWriter;
+import net.fabricmc.mappingio.adapter.MappingNsCompleter;
 import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.test.TestMappings.MappingDir;
+import net.fabricmc.mappingio.test.lib.jool.Unchecked;
 
 public class TestFileUpdater {
 	public static void main(String[] args) throws IOException {
-		for (MappingFormat format : MappingFormat.values()) {
-			if (!format.hasWriter) {
+		if (args.length == 1) {
+			TestUtil.setResourceRoot(mkDir(Paths.get(args[0])));
+		}
+
+		for (MappingDir dir : TestMappings.values()) {
+			if (!dir.supportsGeneration()) {
 				continue;
 			}
 
-			Path defaultPath = TestUtil.MappingDirs.VALID.resolve(TestUtil.getFileName(format));
-			Path holesPath = TestUtil.MappingDirs.HOLES.resolve(TestUtil.getFileName(format));
-			Path repeatPath = TestUtil.MappingDirs.REPEATED_ELEMENTS.resolve(TestUtil.getFileName(format));
+			rmDir(dir.path());
+			mkDir(dir.path());
 
-			TestUtil.acceptTestMappings(MappingWriter.create(defaultPath, format));
-			TestUtil.acceptTestMappingsWithHoles(MappingWriter.create(holesPath, format));
+			for (MappingFormat format : MappingFormat.values()) {
+				if (!format.hasWriter) {
+					continue;
+				}
 
-			if (format != MappingFormat.ENIGMA_DIR) {
-				TestUtil.acceptTestMappingsWithRepeats(
-						MappingWriter.create(repeatPath, format),
-						format != MappingFormat.ENIGMA_FILE,
-						format != MappingFormat.ENIGMA_FILE);
+				MappingVisitor target = MappingWriter.create(dir.pathFor(format), format);
+
+				if (dir == TestMappings.READING.REPEATED_ELEMENTS) {
+					boolean isEnigma = format == MappingFormat.ENIGMA_FILE || format == MappingFormat.ENIGMA_DIR;
+
+					TestMappings.generateRepeatedElements(target, !isEnigma, !isEnigma);
+					continue;
+				}
+
+				if (dir.isIn(TestMappings.PROPAGATION.BASE_DIR) && !format.features().hasNamespaces()) {
+					target = new MappingNsCompleter(target);
+				}
+
+				dir.generate(target);
 			}
+		}
+	}
+
+	private static Path mkDir(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+
+		return path;
+	}
+
+	private static void rmDir(Path path) throws IOException {
+		try (Stream<Path> paths = Files.walk(path)) {
+			paths.sorted(Comparator.reverseOrder()).forEach(Unchecked.consumer(Files::deleteIfExists));
 		}
 	}
 }

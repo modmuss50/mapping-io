@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<migrationMap>
+	<entry oldName="class_1" newName="class1Ns0Rename" type="class"/>
+	<entry oldName="class_1$class_2" newName="class_1$class_2" type="class"/>
+	<entry oldName="class_1$class_2$class_3" newName="class_1$class_2$class_3" type="class"/>
+	<name value="Unnamed migration map"/>
+	<order value="0"/>
+</migrationMap>

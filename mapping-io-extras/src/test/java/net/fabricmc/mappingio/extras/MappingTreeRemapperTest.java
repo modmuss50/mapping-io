@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Type;
 
-import net.fabricmc.mappingio.test.TestUtil;
+import net.fabricmc.mappingio.test.TestMappings;
 import net.fabricmc.mappingio.tree.MappingTree;
 import net.fabricmc.mappingio.tree.MappingTree.ClassMapping;
 import net.fabricmc.mappingio.tree.MappingTree.FieldMapping;
@@ -50,7 +50,7 @@ public class MappingTreeRemapperTest {
 
 	@BeforeAll
 	public static void setup() throws IOException {
-		mappingTree = TestUtil.acceptTestMappings(new MemoryMappingTree());
+		mappingTree = TestMappings.generateValid(new MemoryMappingTree());
 		srcNs = mappingTree.getSrcNamespace();
 		dstNs = mappingTree.getDstNamespaces().get(0);
 

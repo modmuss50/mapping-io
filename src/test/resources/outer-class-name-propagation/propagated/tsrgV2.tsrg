@@ -1,0 +1,4 @@
+tsrg2 source dstNs0 dstNs1 dstNs2 dstNs3 dstNs4 dstNs5 dstNs6
+class_1 class1Ns0Rename class1Ns1Rename class1Ns2Rename class_1 class1Ns4Rename class_1 class_1
+class_1$class_2 class1Ns0Rename$class_2 class1Ns1Rename$class_2 class1Ns2Rename$class2Ns2Rename class_1$class2Ns3Rename class1Ns4Rename$class_2 class_1$class2Ns5Rename class_1$class_2
+class_1$class_2$class_3 class1Ns0Rename$class_2$class_3 class1Ns1Rename$class_2$class_3 class1Ns2Rename$class2Ns2Rename$class_3 class_1$class2Ns3Rename$class_3 class1Ns4Rename$class_2$class_3 class_1$class2Ns5Rename$class3Ns5Rename class_1$class_2$class3Ns6Rename
