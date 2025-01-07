@@ -33,7 +33,7 @@ For further information, please consult the project's Javadocs.
 
 
 ### Maven
-Mapping-IO is available from the [FabricMC Maven](https://maven.fabricmc.net/net/fabricmc/mapping-io), version 0.4.2 and onwards can also be found on Maven Central.
+Mapping-IO is available from the [FabricMC Maven](https://maven.fabricmc.net/net/fabricmc/mapping-io). Version 0.4.2 and onward can also be found on Maven Central.
 
 Gradle snippet:
 ```gradle
@@ -42,6 +42,6 @@ repositories {
 }
 
 dependencies {
-	api 'net.fabricmc:mapping-io:${mappingio_version}'
+	implementation "net.fabricmc:mapping-io:${mappingio_version}"
 }
 ```
