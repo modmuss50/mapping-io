@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7.1] - 2025-01-07
 - Restore the ability to read source-namespace-only mapping files, even if not spec-compliant
 
 ## [0.7.0] - 2025-01-01
@@ -20,10 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added missing visit calls to multiple readers
 - Added safeguards to `MemoryMappingTree` preventing external data modification during an ongoing visitation pass
 - Clearly defined tree-API contracts regarding returned collections' mutability
-- Fixed `MemoryMappingTree#reset` to actually reset all its internal state related to the current visitation pass
+- Fixed `MemoryMappingTree#reset()` to actually reset all its internal state related to the current visitation pass
 - Fixed and improved `MemoryMappingTree`'s merging capabilities:
-  - Fixed broken member mapping merging via tree-API in `MemoryMappingTree`
-  - Fixed existing entries' data not getting overridden when merging elements into `MemoryMappingTree` via tree-API
+  - Fixed broken tree-API member mapping merging
+  - Fixed existing entries' data not getting overridden when merging elements via tree-API
   - Fixed NPE when visiting with flipped namespaces ([issue 68](https://github.com/FabricMC/mapping-io/issues/68))
   - Made merging with flipped namespaces actually work and handle both names and descriptors
   - Fixed potentially incorrect descriptor computation by delaying until all classes are present and merged
