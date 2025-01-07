@@ -63,7 +63,7 @@ public class EmptyContentReadTest {
 		assertThrows(IOException.class, () -> Tiny1FileReader.read(new StringReader(header0), target));
 		assertThrows(IOException.class, () -> Tiny1FileReader.read(new StringReader(header1), target));
 		assertThrows(IOException.class, () -> Tiny1FileReader.read(new StringReader(header2), target));
-		assertThrows(IOException.class, () -> Tiny1FileReader.read(new StringReader(header3), target));
+		Tiny1FileReader.read(new StringReader(header3), target);
 		assertThrows(IOException.class, () -> Tiny1FileReader.read(new StringReader(header4), target));
 		Tiny1FileReader.read(new StringReader(header5), target);
 	}
@@ -80,7 +80,7 @@ public class EmptyContentReadTest {
 		assertThrows(IOException.class, () -> Tiny2FileReader.read(new StringReader(header0), target));
 		assertThrows(IOException.class, () -> Tiny2FileReader.read(new StringReader(header1), target));
 		assertThrows(IOException.class, () -> Tiny2FileReader.read(new StringReader(header2), target));
-		assertThrows(IOException.class, () -> Tiny2FileReader.read(new StringReader(header3), target));
+		Tiny2FileReader.read(new StringReader(header3), target);
 		assertThrows(IOException.class, () -> Tiny2FileReader.read(new StringReader(header4), target));
 		Tiny2FileReader.read(new StringReader(header5), target);
 	}
@@ -113,7 +113,7 @@ public class EmptyContentReadTest {
 		instantiateTree();
 		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header1), target));
 		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header2), target));
-		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header3), target));
+		TsrgFileReader.read(new StringReader(header3), target);
 		assertThrows(IOException.class, () -> TsrgFileReader.read(new StringReader(header4), target));
 		TsrgFileReader.read(new StringReader(header5), target);
 	}

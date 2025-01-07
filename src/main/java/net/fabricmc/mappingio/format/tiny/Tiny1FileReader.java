@@ -74,13 +74,13 @@ public final class Tiny1FileReader {
 		List<String> dstNamespaces = new ArrayList<>();
 		String dstNamespace;
 
-		while ((dstNamespace = reader.nextCol()) != null) {
-			if (dstNamespace.isEmpty()) throw new IOException("empty destination namespace in Tiny v1 header");
+		while (!reader.isAtEol()) {
+			dstNamespace = reader.nextCol();
+			if (dstNamespace == null || dstNamespace.isEmpty()) throw new IOException("empty destination namespace in Tiny v1 header");
 			dstNamespaces.add(dstNamespace);
 		}
 
 		int dstNsCount = dstNamespaces.size();
-		if (dstNsCount == 0) throw new IOException("no destination namespaces in Tiny v1 header");
 
 		Set<MappingFlag> flags = visitor.getFlags();
 		MappingVisitor parentVisitor = null;

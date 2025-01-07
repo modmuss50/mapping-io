@@ -82,12 +82,12 @@ public final class TsrgFileReader {
 			dstNamespaces = new ArrayList<>();
 			String dstNamespace;
 
-			while ((dstNamespace = reader.nextCol()) != null) {
-				if (dstNamespace.isEmpty()) throw new IOException("empty destination namespace in TSRG v2 header");
+			while (!reader.isAtEol()) {
+				dstNamespace = reader.nextCol();
+				if (dstNamespace == null || dstNamespace.isEmpty()) throw new IOException("empty destination namespace in TSRG v2 header");
 				dstNamespaces.add(dstNamespace);
 			}
 
-			if (dstNamespaces.isEmpty()) throw new IOException("no destination namespaces in TSRG v2 header");
 			reader.nextLine(0);
 		} else {
 			if (sourceNs == null || sourceNs.isEmpty()) throw new IllegalArgumentException("provided source namespace must not be null or empty");
