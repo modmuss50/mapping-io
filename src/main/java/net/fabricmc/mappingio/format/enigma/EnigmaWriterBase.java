@@ -106,7 +106,21 @@ abstract class EnigmaWriterBase implements MappingWriter {
 	}
 
 	@Override
-	public abstract boolean visitElementContent(MappedElementKind targetKind) throws IOException;
+	public final boolean visitElementContent(MappedElementKind targetKind) throws IOException {
+		if (targetKind == MappedElementKind.CLASS) {
+			visitClassContent();
+		} else if (targetKind == MappedElementKind.FIELD || targetKind == MappedElementKind.METHOD) {
+			writer.write(' ');
+			writer.write(desc);
+			writer.write('\n');
+		} else {
+			writer.write('\n');
+		}
+
+		return true;
+	}
+
+	abstract void visitClassContent() throws IOException;
 
 	protected static int getNextOuterEnd(String name, int startPos) {
 		int pos;
@@ -185,7 +199,8 @@ abstract class EnigmaWriterBase implements MappingWriter {
 						if (dstEnd < 0) dstEnd = dstName.length();
 						int dstLen = dstEnd - dstStart;
 
-						if (dstLen != srcLen || !srcClassName.regionMatches(srcStart, dstName, dstStart, srcLen)) { // src != dst
+						if (dstLen != srcLen || !srcClassName.regionMatches(srcStart, dstName, dstStart, srcLen) // src != dst
+								|| dstEnd == dstName.length()) { // always write innermost destination name
 							writer.write(' ');
 							writer.write(dstName, dstStart, dstLen);
 						}

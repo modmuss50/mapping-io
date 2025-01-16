@@ -1,5 +1,5 @@
 CLASS class_1
-	CLASS class_2
+	CLASS class_2 class_2
 		FIELD field_2 field_2 Lclass_1$class_2;
-		CLASS class_3
+		CLASS class_3 class_3
 			FIELD field_2 field_2 Lclass_1$class_2$class_3;

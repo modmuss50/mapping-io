@@ -19,7 +19,6 @@ package net.fabricmc.mappingio.format.enigma;
 import java.io.IOException;
 import java.io.Writer;
 
-import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.format.MappingFormat;
 
 /**
@@ -31,17 +30,7 @@ public final class EnigmaFileWriter extends EnigmaWriterBase {
 	}
 
 	@Override
-	public boolean visitElementContent(MappedElementKind targetKind) throws IOException {
-		if (targetKind == MappedElementKind.CLASS) {
-			writeMismatchedOrMissingClasses();
-		} else if (targetKind == MappedElementKind.FIELD || targetKind == MappedElementKind.METHOD) {
-			writer.write(' ');
-			writer.write(desc);
-			writer.write('\n');
-		} else {
-			writer.write('\n');
-		}
-
-		return true;
+	void visitClassContent() throws IOException {
+		writeMismatchedOrMissingClasses();
 	}
 }
