@@ -17,6 +17,7 @@
 package net.fabricmc.mappingio.test.tests.reading;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStreamReader;
@@ -35,21 +36,28 @@ import net.fabricmc.mappingio.test.TestMappings.MappingDir;
 import net.fabricmc.mappingio.test.visitors.NopMappingVisitor;
 
 public class DetectionTest {
-	private static final MappingDir dir = TestMappings.DETECTION;
-
 	@Test
 	public void run() throws Exception {
-		for (MappingFormat format : MappingFormat.values()) {
-			if (format == MappingFormat.RECAF_SIMPLE_FILE) {
-				assertThrows(AssertionFailedError.class, () -> check(format));
-			} else {
-				check(format);
+		for (MappingDir dir : TestMappings.values()) {
+			for (MappingFormat format : MappingFormat.values()) {
+				if (format == MappingFormat.RECAF_SIMPLE_FILE) {
+					assertThrows(AssertionFailedError.class, () -> check(dir, format));
+				} else {
+					check(dir, format);
+				}
 			}
 		}
+
+		assertNull(MappingReader.detectFormat(TestMappings.DETECTION.path().resolve("non-mapping-dir")));
 	}
 
-	private void check(MappingFormat format) throws Exception {
+	private void check(MappingDir dir, MappingFormat format) throws Exception {
 		Path path = dir.pathFor(format);
+
+		if (!Files.exists(path)) {
+			return;
+		}
+
 		assertEquals(format, MappingReader.detectFormat(path));
 
 		if (!format.hasSingleFile()) return;

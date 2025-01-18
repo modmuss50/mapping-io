@@ -21,10 +21,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -46,13 +50,28 @@ public final class MappingReader {
 	}
 
 	@Nullable
-	public static MappingFormat detectFormat(Path file) throws IOException {
-		if (Files.isDirectory(file)) {
-			return MappingFormat.ENIGMA_DIR;
+	public static MappingFormat detectFormat(Path path) throws IOException {
+		if (Files.isDirectory(path)) {
+			String enigmaExt = "." + MappingFormat.ENIGMA_FILE.fileExt;
+			AtomicReference<MappingFormat> ret = new AtomicReference<>();
+
+			Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					if (file.getFileName().toString().endsWith(enigmaExt)) {
+						ret.set(MappingFormat.ENIGMA_DIR);
+						return FileVisitResult.TERMINATE;
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+			});
+
+			return ret.get();
 		}
 
-		try (Reader reader = new InputStreamReader(Files.newInputStream(file), StandardCharsets.UTF_8)) {
-			String fileName = file.getFileName().toString();
+		try (Reader reader = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
+			String fileName = path.getFileName().toString();
 			int dotIdx = fileName.lastIndexOf('.');
 			String fileExt = dotIdx >= 0 ? fileName.substring(dotIdx + 1) : null;
 
