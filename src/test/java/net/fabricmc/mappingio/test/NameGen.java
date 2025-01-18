@@ -253,8 +253,8 @@ class NameGen {
 	private static final String argPrefix = "param";
 	private static final String varPrefix = "var";
 	private static final String comment = "This is a comment";
-	private static final List<String> fldDescs = Collections.unmodifiableList(Arrays.asList("I", "Lcls;", "Lpkg/cls;", "[I"));
-	private static final List<String> mthDescs = Collections.unmodifiableList(Arrays.asList("()I", "(I)V", "(Lcls;)Lcls;", "(ILcls;)Lpkg/cls;", "(Lcls;[I)[[B"));
+	private static final List<String> fldDescs = Collections.unmodifiableList(Arrays.asList("I", "Lcls;", "Lpkg/cls;", "[I", null));
+	private static final List<String> mthDescs = Collections.unmodifiableList(Arrays.asList("()I", "(I)V", "(Lcls;)Lcls;", "(ILcls;)Lpkg/cls;", "(Lcls;[I)[[B", null));
 	private static final MappedElementKind clsKind = MappedElementKind.CLASS;
 	private static final MappedElementKind fldKind = MappedElementKind.FIELD;
 	private static final MappedElementKind mthKind = MappedElementKind.METHOD;

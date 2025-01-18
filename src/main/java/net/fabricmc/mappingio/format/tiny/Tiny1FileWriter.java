@@ -100,6 +100,10 @@ public final class Tiny1FileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitField(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
 
@@ -108,6 +112,10 @@ public final class Tiny1FileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitMethod(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
 

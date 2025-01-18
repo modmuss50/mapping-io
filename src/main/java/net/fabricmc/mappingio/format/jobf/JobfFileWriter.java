@@ -61,6 +61,10 @@ public final class JobfFileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitField(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
 		dstName = null;
@@ -70,6 +74,10 @@ public final class JobfFileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitMethod(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
 		dstName = null;
@@ -114,7 +122,6 @@ public final class JobfFileWriter implements MappingWriter {
 			write("c ");
 		} else if ((isField = targetKind == MappedElementKind.FIELD)
 				|| targetKind == MappedElementKind.METHOD) {
-			if (memberSrcDesc == null) return false;
 			write(isField ? "f " : "m ");
 		} else {
 			throw new IllegalStateException("unexpected invocation for "+targetKind);

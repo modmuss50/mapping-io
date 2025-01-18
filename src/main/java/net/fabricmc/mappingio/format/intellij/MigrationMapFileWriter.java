@@ -55,7 +55,7 @@ public final class MigrationMapFileWriter implements MappingWriter {
 				if (!wroteOrder) {
 					xmlWriter.writeCharacters("\n\t");
 					xmlWriter.writeEmptyElement("order");
-					xmlWriter.writeAttribute("value", "0");
+					xmlWriter.writeAttribute("value", MigrationMapConstants.DEFAULT_ORDER);
 				}
 
 				xmlWriter.writeCharacters("\n");
@@ -101,9 +101,11 @@ public final class MigrationMapFileWriter implements MappingWriter {
 		try {
 			switch (key) {
 			case "name":
+				if (value == null) return;
 				wroteName = true;
 				break;
 			case MigrationMapConstants.ORDER_KEY:
+				if (value == null) return;
 				wroteOrder = true;
 				key = "order";
 				break;
@@ -111,7 +113,10 @@ public final class MigrationMapFileWriter implements MappingWriter {
 
 			xmlWriter.writeCharacters("\n\t");
 			xmlWriter.writeEmptyElement(key);
-			xmlWriter.writeAttribute("value", value);
+
+			if (value != null) {
+				xmlWriter.writeAttribute("value", value);
+			}
 		} catch (XMLStreamException e) {
 			throw new IOException(e);
 		}

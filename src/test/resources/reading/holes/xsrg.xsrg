@@ -5,6 +5,5 @@ CL: class_15$class_16 class_15$class16Ns0Rename
 CL: package_20/class_20$class_21$class_22 package_20/class_20$class_21$class22Ns0Rename
 CL: class_29$class_30$class_31 class_29$class_30$class31Ns0Rename
 FD: class_35/field_2 Lcls; class_35/field2Ns0Rename Lcls;
-FD: class_35/field_5 I class_35/field5Ns0Rename I
 MD: class_35/method_2 (I)V class_35/method2Ns0Rename (I)V
 MD: class_35/method_5 (Lcls;[I)[[B class_35/method5Ns0Rename (Lcls;[I)[[B

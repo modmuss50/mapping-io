@@ -3,6 +3,5 @@ c class_15$class_16 = class_15$class16Ns0Rename
 c package_20.class_20$class_21$class_22 = class_20$class_21$class22Ns0Rename
 c class_29$class_30$class_31 = class_29$class_30$class31Ns0Rename
 f class_35.field_2:Lcls; = field2Ns0Rename
-f class_35.field_5:I = field5Ns0Rename
 m class_35.method_2(I)V = method2Ns0Rename
 m class_35.method_5(Lcls;[I)[[B = method5Ns0Rename

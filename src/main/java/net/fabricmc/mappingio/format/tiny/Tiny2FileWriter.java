@@ -108,6 +108,10 @@ public final class Tiny2FileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitField(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		write("\tf\t");
 		writeName(srcDesc);
 		writeTab();
@@ -118,6 +122,10 @@ public final class Tiny2FileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitMethod(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		write("\tm\t");
 		writeName(srcDesc);
 		writeTab();

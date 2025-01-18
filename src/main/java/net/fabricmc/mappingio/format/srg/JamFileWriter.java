@@ -61,6 +61,10 @@ public final class JamFileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitField(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
 		memberDstName = null;

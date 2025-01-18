@@ -68,6 +68,10 @@ public final class CsrgFileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitMethod(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		memberSrcName = srcName;
 		methodSrcDesc = srcDesc;
 

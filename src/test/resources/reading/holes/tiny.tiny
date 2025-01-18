@@ -13,9 +13,7 @@ CLASS	class_29$class_30$class_31	class_29$class_30$class31Ns0Rename
 CLASS	package_32/class_32$class_33$class_34		package_32/class_32$class_33$class34Ns1Rename
 FIELD	class_35	Lcls;	field_2	field2Ns0Rename	
 FIELD	class_35	Lpkg/cls;	field_3		field3Ns1Rename
-FIELD	class_35	I	field_5	field5Ns0Rename	
-FIELD	class_35	Lcls;	field_6		field6Ns1Rename
+FIELD	class_35	I	field_6		field6Ns1Rename
 METHOD	class_35	(I)V	method_2	method2Ns0Rename	
 METHOD	class_35	(Lcls;)Lcls;	method_3		method3Ns1Rename
 METHOD	class_35	(Lcls;[I)[[B	method_5	method5Ns0Rename	
-METHOD	class_35	()I	method_6		method6Ns1Rename

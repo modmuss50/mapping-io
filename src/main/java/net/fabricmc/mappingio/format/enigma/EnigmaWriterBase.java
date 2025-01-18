@@ -59,6 +59,10 @@ abstract class EnigmaWriterBase implements MappingWriter {
 
 	@Override
 	public boolean visitField(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		writeIndent(0);
 		writer.write("FIELD ");
 		writer.write(srcName);
@@ -70,6 +74,10 @@ abstract class EnigmaWriterBase implements MappingWriter {
 
 	@Override
 	public boolean visitMethod(String srcName, @Nullable String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		writeIndent(0);
 		writer.write("METHOD ");
 		writer.write(srcName);

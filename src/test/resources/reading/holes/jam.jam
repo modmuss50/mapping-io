@@ -5,8 +5,7 @@ CL class_15$class_16 class_15$class16Ns0Rename
 CL package_20/class_20$class_21$class_22 package_20/class_20$class_21$class22Ns0Rename
 CL class_29$class_30$class_31 class_29$class_30$class31Ns0Rename
 FD class_35 field_2 Lcls; field2Ns0Rename
-FD class_35 field_5 I field5Ns0Rename
 MD class_35 method_2 (I)V method2Ns0Rename
 MD class_35 method_5 (Lcls;[I)[[B method5Ns0Rename
-MP class_35 method_7 (I)V 4 param3Ns0Rename
-MP class_35 method_7 (I)V 8 param5Ns0Rename
+MP class_35 method_7 ()I 4 param3Ns0Rename
+MP class_35 method_7 ()I 8 param5Ns0Rename

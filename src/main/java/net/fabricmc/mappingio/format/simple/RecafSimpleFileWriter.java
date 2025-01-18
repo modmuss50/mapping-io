@@ -66,6 +66,10 @@ public final class RecafSimpleFileWriter implements MappingWriter {
 
 	@Override
 	public boolean visitMethod(String srcName, String srcDesc) throws IOException {
+		if (srcDesc == null) {
+			return false;
+		}
+
 		memberSrcName = srcName;
 		memberSrcDesc = srcDesc;
 

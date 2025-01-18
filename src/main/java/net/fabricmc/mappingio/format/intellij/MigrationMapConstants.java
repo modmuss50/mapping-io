@@ -25,4 +25,5 @@ public final class MigrationMapConstants {
 
 	public static final String ORDER_KEY = "migrationmap:order";
 	public static final String MISSING_NAME = "Unnamed migration map";
+	public static final String DEFAULT_ORDER = "0";
 }

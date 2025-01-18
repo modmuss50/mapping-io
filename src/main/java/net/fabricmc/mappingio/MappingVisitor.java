@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
  * </ul>
  *
  * <p>The elements with a skip-return (Header/Content/Class/Field/Method/Arg/Var/ElementContent) abort processing the
- * remainder of their associated item in the above listing if requested by a {@code true} return value. For example
+ * remainder of their associated item in the above listing if requested by a {@code false} return value. For example
  * skipping in Class does neither DstName nor ElementContent, but continues with another class or End.
  *
  * <p>Returning {@code false} in End requests another complete visitation pass if the flag

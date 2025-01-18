@@ -2,6 +2,8 @@
 <migrationMap>
 	<name value="repeated-elements"/>
 	<order value="0"/>
+	<property-with-empty-value value=""/>
+	<property-with-null-value/>
 	<entry oldName="class_1" newName="class1Ns0Rename0" type="class"/>
 	<entry oldName="class_1" newName="class1Ns0Rename" type="class"/>
 	<entry oldName="class_1$class_2" newName="class1Ns0Rename$class2Ns0Rename0" type="class"/>
