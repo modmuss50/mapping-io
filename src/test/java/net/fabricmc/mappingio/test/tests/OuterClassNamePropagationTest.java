@@ -98,6 +98,34 @@ public class OuterClassNamePropagationTest {
 		}
 	}
 
+	@Test
+	public void tree() throws IOException {
+		for (int pass = 1; pass <= 2; pass++) {
+			boolean processRemappedDstNames = pass == 1;
+
+			VisitableMappingTree tree = acceptMappings(new MemoryMappingTree());
+			tree.propagateOuterClassNames(processRemappedDstNames);
+			tree.accept(new OuterClassNameChecker(true, dstNamespaces, processRemappedDstNames));
+
+			checkDiskEquivalence(tree, processRemappedDstNames);
+		}
+
+		VisitableMappingTree tree = acceptMappings(new MemoryMappingTree());
+
+		assertThrows(UnsupportedOperationException.class, () -> tree.propagateOuterClassNames(
+				dstNamespaces.get(0),
+				Collections.singletonList(srcNamespace),
+				false));
+		assertThrows(IllegalArgumentException.class, () -> tree.propagateOuterClassNames(
+				invalidNs,
+				tree.getDstNamespaces(),
+				false));
+		assertThrows(IllegalArgumentException.class, () -> tree.propagateOuterClassNames(
+				tree.getSrcNamespace(),
+				Collections.singletonList(invalidNs),
+				false));
+	}
+
 	private void checkDiskEquivalence(VisitableMappingTree tree, boolean processRemappedDstNames) throws IOException {
 		for (MappingFormat format : MappingFormat.values()) {
 			MappingDir dir = processRemappedDstNames

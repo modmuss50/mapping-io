@@ -16,8 +16,10 @@
 
 package net.fabricmc.mappingio.tree;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -109,6 +111,86 @@ public interface MappingTree extends MappingTreeView {
 	 */
 	@Nullable
 	ClassMapping removeClass(String srcName);
+
+	/**
+	 * Searches for inner classes whose effective destination name contains outer classes referenced via their source name,
+	 * scans the tree for potential mappings for these enclosing classes, and applies the latters' destination names
+	 * to the formers' fully qualified name.
+	 *
+	 * <p>For example, it takes a class {@code class_1$class_2} that doesn't have a mapping,
+	 * tries to find {@code class_1}, which let's say has the mapping {@code SomeClass},
+	 * and changes the former's destination name to {@code SomeClass$class_2}.
+	 *
+	 * <p>Equivalent of {@link OuterClassNameInheritingVisitor}, but more efficient
+	 * since the tree's existing class map can be reused.
+	 *
+	 * @param processRemappedDstNames Whether already remapped destination names should also get their unmapped outer classes replaced.
+	 */
+	default void propagateOuterClassNames(boolean processRemappedDstNames) {
+		propagateOuterClassNames(getSrcNamespace(), getDstNamespaces(), processRemappedDstNames);
+	}
+
+	/**
+	 * Searches for inner classes whose effective destination name contains outer classes referenced via their source name,
+	 * scans the tree for potential mappings for these enclosing classes, and applies the latters' destination names
+	 * to the formers' fully qualified name.
+	 *
+	 * <p>For example, it takes a class {@code class_1$class_2} that doesn't have a mapping,
+	 * tries to find {@code class_1}, which let's say has the mapping {@code SomeClass},
+	 * and changes the former's destination name to {@code SomeClass$class_2}.
+	 *
+	 * <p>Equivalent of {@link OuterClassNameInheritingVisitor}, but more efficient
+	 * since the tree's existing class map can be reused.
+	 *
+	 * @param srcNamespace The namespace where the original/unmapped outer class names originate from.
+	 * @param dstNamespaces The namespaces where outer class names shall be propagated.
+	 * @param processRemappedDstNames Whether already remapped destination names should also get their unmapped outer classes replaced.
+	 */
+	default void propagateOuterClassNames(String srcNamespace, Collection<String> dstNamespaces, boolean processRemappedDstNames) {
+		int srcNsId = getNamespaceId(srcNamespace);
+		if (srcNsId == NULL_NAMESPACE_ID) throw new IllegalArgumentException("Namespace " + srcNsId + " does not exist");
+
+		for (ClassMapping cls : getClasses()) {
+			for (String dstNs : dstNamespaces) {
+				int dstNsId = getNamespaceId(dstNs);
+				if (dstNsId == SRC_NAMESPACE_ID) throw new UnsupportedOperationException("Cannot change source names");
+				if (dstNsId == NULL_NAMESPACE_ID) throw new IllegalArgumentException("Destination namespace " + dstNs + " does not exist");
+				if (dstNsId == srcNsId) continue;
+
+				String srcName = cls.getName(srcNsId);
+				if (srcName == null) continue;
+				String dstName = cls.getName(dstNsId);
+
+				int idx = srcName.lastIndexOf('$');
+				if (idx == -1) continue;
+
+				if (!processRemappedDstNames && dstName != null && !dstName.equals(srcName)) {
+					continue;
+				}
+
+				String[] srcParts = srcName.split(Pattern.quote("$"));
+				String[] dstParts = dstName == null ? srcParts : dstName.split(Pattern.quote("$"));
+				assert dstParts.length == srcParts.length;
+
+				for (int pos = srcParts.length - 2; pos >= 0; pos--) {
+					String outerSrcName = String.join("$", Arrays.copyOfRange(srcParts, 0, pos + 1));
+
+					if (dstName != null && !dstParts[pos].equals(srcParts[pos])) {
+						// That part already has a different mapping
+						continue;
+					}
+
+					ClassMapping outerCls = getClass(outerSrcName, srcNsId);
+					String outerDstName;
+
+					if (outerCls != null && (outerDstName = outerCls.getName(dstNsId)) != null && !outerDstName.equals(outerSrcName)) {
+						cls.setDstName(outerDstName + "$" + String.join("$", Arrays.copyOfRange(dstParts, pos + 1, dstParts.length)), dstNsId);
+						break;
+					}
+				}
+			}
+		}
+	}
 
 	@Override
 	@Nullable

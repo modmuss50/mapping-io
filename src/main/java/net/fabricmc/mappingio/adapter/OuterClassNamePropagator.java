@@ -259,8 +259,6 @@ public class OuterClassNamePropagator extends ForwardingMappingVisitor {
 	private final boolean processRemappedDstNames;
 	private final Map<String, String[]> dstNamesBySrcName = new HashMap<>();
 	private final Set<String> modifiedClasses = new HashSet<>();
-	private String srcNamespaceToProcess;
-	private int srcNsId;
 	private List<String> dstNamespaces;
 	private Collection<String> dstNamespacesToProcess;
 	private Collection<Integer> dstNamespaceIndicesToProcess;
