@@ -16,3 +16,4 @@ pluginManagement {
 rootProject.name = 'mapping-io'
 
 include 'mapping-io-extras'
+include 'mapping-io-wasm'

@@ -1,0 +1,21 @@
+<script type="text/javascript" charset="utf-8" src="build/generated/teavm/wasm-gc/mapping-io.wasm-runtime.js"></script>
+<script type="application/javascript">
+    async function loadMappings() {
+        const teavm = await TeaVM.wasmGC.load("build/generated/teavm/wasm-gc/mapping-io.wasm");
+
+        var mappings = teavm.exports.readTinyV2("tiny	2	0	official	intermediary	named\nc	a	net/minecraft/class_7833	net/minecraft/util/math/RotationAxis");
+        console.log(mappings.getSrcNamespace());
+        console.log(mappings.getDstNamespaces());
+
+        var named = mappings.getNamespaceId("named");
+        var intermediary = mappings.getNamespaceId("intermediary");
+
+        mappings.getClasses().forEach(c => {
+            console.log(c.getSrcName());
+            console.log(c.getDstName(named));
+            console.log(c.getDstName(intermediary));
+        });
+    }
+
+    loadMappings()
+</script>

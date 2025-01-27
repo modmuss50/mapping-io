@@ -1,0 +1,28 @@
+apply plugin: "org.teavm"
+
+repositories {
+	mavenCentral()
+}
+
+java {
+	sourceCompatibility = 11
+	targetCompatibility = 11
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 11
+}
+
+dependencies {
+	implementation project(":")
+}
+
+teavm {
+	all {
+		mainClass = "net.fabricmc.mappingio.wasm.MappingIoWasm"
+	}
+	wasmGC {
+		addedToWebApp = true
+		targetFileName = "mapping-io.wasm"
+	}
+}

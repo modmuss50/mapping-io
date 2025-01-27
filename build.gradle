@@ -1,6 +1,7 @@
 plugins {
 	id "com.diffplug.spotless" apply false
 	id "me.modmuss50.remotesign" apply false
+	id "org.teavm" version "0.11.0" apply false
 }
 
 def ENV = System.getenv()
